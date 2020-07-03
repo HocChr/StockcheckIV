@@ -5,7 +5,7 @@ set(CMAKE_MAKE_PROGRAM "C:/Ninja/ninja.exe" CACHE FILEPATH "Ninja Generator" FOR
 endif()
 
 # 3rd party tools
-find_package(Qt5 COMPONENTS Widgets Qml Quick REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Qml Quick Charts REQUIRED)
 
 # Directory with source code
 add_subdirectory(src)
