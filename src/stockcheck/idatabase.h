@@ -2,11 +2,13 @@
 #define IDATABASE_H
 
 #include "stockentity.h"
-#include <list>
+#include <vector>
 
 class IDatabase
 {
-    virtual std::list<StockEntity> GetStocks() = 0;
+public:
+
+    virtual std::vector<StockEntity> GetStocks() = 0;
 };
 
 #endif // IDATABASE_H

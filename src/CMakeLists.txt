@@ -9,10 +9,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(PROJECT "MinimalQml")
 
-project(${PROJECT})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++11 -fstrict-aliasing -pedantic-errors -pedantic -Wno-deprecated-declarations -Wno-unused-variable")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -std=c++17 -fstrict-aliasing -pedantic-errors -pedantic")
 
 if(NOT DEFINED HEADERS)
     file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -22,13 +20,20 @@ if(NOT DEFINED SOURCES)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 endif()
 
+
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
 
+
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
+
+add_subdirectory(stockcheck)
 
 target_link_libraries(${PROJECT}
     Qt5::Widgets
     Qt5::Qml
     Qt5::Quick
+    stockcheck
     )
+
+

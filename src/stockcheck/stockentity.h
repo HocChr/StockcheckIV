@@ -1,8 +1,10 @@
 #ifndef STOCKENTITY_H
 #define STOCKENTITY_H
 
-#include <list>
+#include <vector>
+#include <algorithm>
 #include <string>
+#include <iostream>
 
 // Datensatz, der eine Aktie repräsentiert
 class StockEntity
@@ -17,6 +19,11 @@ public:
         double Dividend{0.0};
         double Earnings{0.0};
         int Year{0};
+
+        YearDataSet(int year, double earning, double dividend) :
+            Dividend{dividend}, Earnings{earning}, Year{year} 
+        {
+        }
 
         bool operator <(const YearDataSet& other)
         {
@@ -116,15 +123,15 @@ public:
         _numYearsDividendNotReduced = value;
     }
 
-    std::list<YearDataSet> GetYearData() const
+    const std::vector<YearDataSet>& GetYearData() const
     {
         return _yearData;
     }
 
-    void SetYearData(const std::list<YearDataSet>& value)
+    void SetYearData(const std::vector<YearDataSet>& value)
     {
         _yearData = value;
-        _yearData.sort();
+        sort(_yearData.begin(), _yearData.end());
     }
 
     void AddRemark(const std::string& remark)
@@ -138,7 +145,7 @@ public:
     }
 
  private:
-     std::list<StockEntity::YearDataSet> _yearData;
+     std::vector<StockEntity::YearDataSet> _yearData;
      std::string _name;
      std::string _remarks = "";
      Rate _rating = Rate::C;

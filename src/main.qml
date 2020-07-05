@@ -1,8 +1,10 @@
-import QtQuick 2.7
+import QtQuick 2.15
 import QtQuick.Layouts 1.3
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.13
 import QtCharts 2.3
-import QtQuick.Window 2.3
+import QtQuick.Window 2.12
+//import QtQuick.Controls 1.4 as OldControls
+import TableModel 0.1
 
 ApplicationWindow {
     id: window
@@ -28,49 +30,70 @@ ApplicationWindow {
 
         // --- Table ----------------------------------------------------------
         TableView {
+            //anchors.fill: parent
             height: window.height/2
-            TableViewColumn {
-                role: "name"
-                title: "Name"
-                width: 200
+
+            columnSpacing: 1
+            rowSpacing: 1
+            clip: true
+
+            model: TableModel {}
+
+            delegate: Rectangle {
+            //    //implicitWidth: 100
+            //    //implicitHeight: 50
+                Text {
+                    text: display
+                }
             }
-            TableViewColumn {
-                role: "year"
-                title: "Jahr"
-                width: 60
-            }
-            TableViewColumn {
-                role: "percentage"
-                title: "Rang"
-                width: 60
-            }
-            TableViewColumn {
-                role: "earningCorrelation"
-                title: "Gewinnkorrelation"
-                width: 120
-            }
-            TableViewColumn {
-                role: "earningGrowth"
-                title: "Gewinnwachstum"
-                width: 120
-            }
-            TableViewColumn {
-                role: "dividendGrowth"
-                title: "Dividendenwachstum"
-                width: 120
-            }
-            TableViewColumn {
-                role: "payoutRatio"
-                title: "Auschüttungsquote"
-                width: 120
-            }
-            TableViewColumn {
-                role: "remark"
-                title: "Bemerkung"
-                width: 250
-            }
-            model: libraryModel
         }
+
+        //OldControls.TableView {
+        //    id : stocksTable
+        //
+        //    height: window.height/2
+        //    OldControls.TableViewColumn {
+        //        role: "name"
+        //        title: "Name"
+        //        width: 200
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "year"
+        //        title: "Jahr"
+        //        width: 60
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "percentage"
+        //        title: "Rang"
+        //        width: 60
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "earningCorrelation"
+        //        title: "Gewinnkorrelation"
+        //        width: 120
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "earningGrowth"
+        //        title: "Gewinnwachstum"
+        //        width: 120
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "dividendGrowth"
+        //        title: "Dividendenwachstum"
+        //        width: 120
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "payoutRatio"
+        //        title: "Auschüttungsquote"
+        //        width: 120
+        //    }
+        //    OldControls.TableViewColumn {
+        //        role: "remark"
+        //        title: "Bemerkung"
+        //        width: 250
+        //    }
+        //    model: libraryModel
+        //}
         // --- Chart ----------------------------------------------------------
         Rectangle {
             ChartView {
