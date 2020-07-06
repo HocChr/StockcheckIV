@@ -31,7 +31,7 @@ public:
         }
     };
 
-    enum Rate
+    enum class Rate
     {
         A,
         B,
