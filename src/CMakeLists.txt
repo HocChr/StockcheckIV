@@ -20,20 +20,24 @@ if(NOT DEFINED SOURCES)
     file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 endif()
 
-
 source_group("Header Files" FILES ${HEADERS})
 source_group("Source Files" FILES ${SOURCES})
-
 
 add_executable(${PROJECT} ${HEADERS} ${SOURCES} ${QT_RESOURCES})
 
 add_subdirectory(stockcheck)
+add_subdirectory(sqliteAccess)
+add_subdirectory(configHandler)
 
 target_link_libraries(${PROJECT}
     Qt5::Widgets
     Qt5::Qml
     Qt5::Quick
+    Qt5::QuickControls2
+    Qt5::Charts
     stockcheck
+    sqliteAccess
+    configHandler
     )
 
 

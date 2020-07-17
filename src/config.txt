@@ -1,0 +1,9 @@
+# Das ist die Konfiguration für das Program Stockcheck und StockcheckDatabase.
+# Füge den Angaben der Datenbanken KEINE Endungen (".db") hinzu, denn die Programme fügen geeignete Endungen selbst zu.
+CurrentDatabase : Europa
+CurrentYear : 2020
+Database1 : USA
+Database2 : Deutschland
+Database3 : Europa
+#Database4 : notspecifiedyet
+#Database5 : notspecifiedyet

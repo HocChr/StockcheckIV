@@ -7,58 +7,110 @@ class Evaluator
 {
 public:
 
-	void CalculateAndEvaluate(std::vector<StockEntity>& stocks)
-	{
-		for (auto& stock : stocks)
-		{
-			if (!Calculate(stock)) continue;
-			Evaluate(stock);
-			doRating(stock);
-		}
-	}
+    void CalculateAndEvaluate(std::vector<StockEntity>& stocks)
+    {
+        for (auto& stock : stocks)
+        {
+            if (!Calculate(stock))
+            {
+                stock.AddRemark("Keine Auswertung");
+                continue;
+            }
+
+            if(isNoDividendStock(stock))
+                EvaluateGrowthStock(stock);
+            else
+                EvaluateDividendStock(stock);
+
+            doRating(stock);
+        }
+    }
 
 private:
 
+    double _minHold = 0.5;
+    double _minBuy = 0.8;
+
 	void doRating(StockEntity& stock)
 	{
-		if (stock.Percentage() >= 80.0)
+        if (stock.Percentage() >= _minBuy * 100.0)
 		{
             stock.SetRating(StockEntity::Rate::A);
             return;
 		}
-		else if (stock.Percentage() >= 50.0)
+        else if (stock.Percentage() >= _minHold * 100.0)
 		{
             stock.SetRating(StockEntity::Rate::B);
             return;
 		}
 		stock.SetRating(StockEntity::Rate::C);
-	}
+    }
 
-	void Evaluate(StockEntity& stock)
-	{
-		double percentage = 0.0;
-
-		percentage = PercentageOfEarningCorrelation(stock);
-		percentage += PercentageOfEarningGrowth(stock);
-		percentage += PercentageOfDividendGrowth(stock);
-		percentage += PercentageOfDividendYearsNotCutted(stock);
-		percentage += PercentageOfPayoutRatio(stock);
-		
-		stock.SetPercentag(100.0 * percentage / 5.0);
-	}
-
-    double PercentageOfEarningCorrelation(const StockEntity& stock)
+    void EvaluateGrowthStock(StockEntity& stock)
     {
-        double minimalCorrelation = 0.0;
+        double percentage = 0.0, percentageTmp = 0.0;
+
+        percentageTmp = PercentageOfEarningCorrelation(stock, 0.5);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Gewinnkorrelation gering");
+        percentage = percentageTmp;
+
+        percentageTmp = PercentageOfEarningGrowth(stock, 10.0);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Gewinnwachstum gering");
+        percentage += percentageTmp;
+
+        if(percentage > _minHold)
+            stock.SetStockType(StockEntity::StockType::GrowthStock);
+
+        stock.SetPercentag(100.0 * percentage / 2.0);
+    }
+
+    void EvaluateDividendStock(StockEntity& stock)
+    {
+        double percentage = 0.0, percentageTmp = 0.0;
+
+        percentageTmp = PercentageOfEarningCorrelation(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Gewinnkorrelation gering");
+        percentage = percentageTmp;
+
+        percentageTmp = PercentageOfEarningGrowth(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Gewinnwachstum gering");
+        percentage += percentageTmp;
+
+        percentageTmp = PercentageOfDividendGrowth(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Dividendenwachstum gering");
+        percentage += percentageTmp;
+
+        percentageTmp = PercentageOfDividendYearsNotCutted(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Dividende nicht stabil");
+        percentage += percentageTmp;
+
+        percentageTmp = PercentageOfPayoutRatio(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Auschüttungsquote nicht gut");
+        percentage += percentageTmp;
+
+        if(percentage > _minHold)
+            stock.SetStockType(StockEntity::StockType::DivididendStock);
+
+        stock.SetPercentag(100.0 * percentage / 5.0);
+    }
+
+    double PercentageOfEarningCorrelation(const StockEntity& stock, double minimalCorrelation = 0.0)
+    {
         double maximalCorrelation = 1.0;
 
         return CalcPercentage(minimalCorrelation, maximalCorrelation, stock.EarningCorrelation());
     }
 
-    double PercentageOfEarningGrowth(const StockEntity& stock)
+    double PercentageOfEarningGrowth(const StockEntity& stock, double maximalGrowth = 5.0)
     {
         double minimalGrowth = 0.0;
-        double maximalGrowth = 5.0;
 
         return CalcPercentage(minimalGrowth, maximalGrowth, stock.EarningGrowthThreeYears());
     }
@@ -81,8 +133,8 @@ private:
 
     double PercentageOfPayoutRatio(StockEntity& stock)
     {
-        auto percentage0 = CalcPercentage(0.0, 50.0, stock.PayoutRatio());
-        auto percentage1 = 1.0 - CalcPercentage(50.0, 100.0, stock.PayoutRatio());
+        auto percentage0 = CalcPercentage(0.0, 40.0, stock.PayoutRatio());
+        auto percentage1 = 1.0 - CalcPercentage(60.0, 100.0, stock.PayoutRatio());
 
         auto best = std::min(percentage0, percentage1);
         return best;
@@ -110,6 +162,12 @@ private:
 	}
 
     // --- functions for calculating ---------------------------------------
+
+    bool isNoDividendStock(const StockEntity& stock)
+    {
+        return stock.PayoutRatio() < 0.1 &&
+            stock.NumYearsDividendNotReduced() == static_cast<int>(stock.GetYearData().size()) - 1;
+    }
 
 	bool Calculate(StockEntity& stock)
 	{
@@ -223,7 +281,7 @@ private:
     {
         if (std::abs(bb) < 1.0e-6 || n < 1)
         {
-            return -2.0;
+            return 0.0;
         }
 
         double quotient = eb / bb;

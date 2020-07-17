@@ -33,15 +33,45 @@ public:
 
     enum class Rate
     {
-        A,
+        A = 0,
         B,
         C
     };
 
-    StockEntity(std::string name)
+    enum class StockType
     {
-        _name = name;
+        None = 0,
+        DivididendStock,
+        GrowthStock
+    };
+
+    StockEntity(std::string name) : _name(std::move(name))
+    {
     }
+
+    //StockEntity()= delete;
+
+    //StockEntity(const StockEntity& other)
+    //{
+    //    this->_name = other._name;
+    //}
+    //
+    //StockEntity(StockEntity&& other)
+    //{
+    //    std::move(other);
+    //}
+    //
+    //StockEntity& operator=(const StockEntity& other)
+    //{
+    //    this->_name = other._name;
+    //    return *this;
+    //}
+    //
+    //StockEntity& operator=(StockEntity&& other)
+    //{
+    //    std::move(other);
+    //    return *this;
+    //}
 
     Rate Rating() const
     {
@@ -51,6 +81,16 @@ public:
     void SetRating(Rate value)
     {
         _rating = value;
+    }
+
+    StockType Type() const
+    {
+        return _type;
+    }
+
+    void SetStockType(StockType value)
+    {
+        _type = value;
     }
 
     std::string Name() const
@@ -146,9 +186,10 @@ public:
 
  private:
      std::vector<StockEntity::YearDataSet> _yearData;
-     std::string _name;
+     std::string _name = "";
      std::string _remarks = "";
      Rate _rating = Rate::C;
+     StockType _type = StockType::None;
 
      double _percentage{0.0};
      double _earningCorrelation{0.0};
