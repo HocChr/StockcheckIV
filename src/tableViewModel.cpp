@@ -217,9 +217,7 @@ private:
 
 TableModel::TableModel() : QAbstractTableModel (nullptr)
 {
-    ConfigurationHandler::Configuration config = ConfigurationHandler::getConfiguration();
-    _dataBase = make_unique<SqliteAccess>();
-    databaseChanged(config.CURRENT_DATABASE.c_str());
+    onActualize();
 }
 
 int TableModel::rowCount(const QModelIndex &) const
@@ -454,6 +452,15 @@ void TableModel::onDatabaseChanged(QString databaseNameNew)
     auto config = ConfigurationHandler::getConfiguration();
     config.CURRENT_DATABASE = databaseNameNew.toStdString();
     ConfigurationHandler::setConfiguration(config);
+}
+
+void TableModel::onActualize()
+{
+    ConfigurationHandler::Configuration config = ConfigurationHandler::getConfiguration();
+    _dataBase = make_unique<SqliteAccess>();
+    databaseChanged(config.CURRENT_DATABASE.c_str());
+
+    emit layoutChanged();
 }
 
 void TableModel::databaseChanged(QString databaseNameNew)
