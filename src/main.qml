@@ -244,6 +244,12 @@ Rating C."
                 movable: false
             }
             TableViewColumn {
+                role: "revenueCorrelation"
+                title: "Umsatzkorrelation"
+                width: 120
+                movable: false
+            }
+            TableViewColumn {
                 role: "earningCorrelation"
                 title: "Gewinnkorrelation"
                 width: 120

@@ -34,7 +34,7 @@ static int callbackFillEntities(void *data, int argc, char **argv, char **azColN
     StockEntity* entity = static_cast<StockEntity*>(data);
 
     int year{0};
-    double earning{0.0}, dividend{0.0};
+    double revenue{0.0}, earning{0.0}, dividend{0.0};
     auto yearData = entity->GetYearData();
     for(int i = 0; i<argc; i++)
     {
@@ -42,6 +42,10 @@ static int callbackFillEntities(void *data, int argc, char **argv, char **azColN
         if(strcmp ("year", azColName[i]) == 0)
         {
             year = atoi(argv[i]);
+        }
+        else if(strcmp ("revenue", azColName[i]) == 0)
+        {
+            revenue = atof(argv[i]);
         }
         else if(strcmp ("earning_per_share", azColName[i]) == 0)
         {
@@ -56,7 +60,7 @@ static int callbackFillEntities(void *data, int argc, char **argv, char **azColN
             continue;
         }
     }
-    yearData.push_back(StockEntity::YearDataSet(year, earning, dividend));
+    yearData.push_back(StockEntity::YearDataSet(year, revenue, earning, dividend));
     entity->SetYearData(yearData);
 
     return 0;
@@ -123,9 +127,9 @@ static StockEntity getStock(SqliteDatabaseHandler& dbHandler, std::string name)
 // --- SqliteAccess -----------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-void SqliteAccess::setDatabasePath(std::experimental::filesystem::__cxx11::path databasePath)
+void SqliteAccess::setDatabasePath(std::experimental::filesystem::path path)
 {
-    _databasePath = databasePath;
+    _databasePath = path;
 }
 
 std::vector<StockEntity> SqliteAccess::GetStocks()

@@ -229,7 +229,7 @@ int TableModel::rowCount(const QModelIndex &) const
 
 int TableModel::columnCount(const QModelIndex &) const
 {
-    return 10;
+    return 11;
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
@@ -259,6 +259,8 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     }
     case Role::Percentage:
         return QString::number(_data[static_cast<size_t>(index.row())].Percentage(), 'f', 0);
+    case Role::RevenueCorrelation:
+        return QString::number(_data[static_cast<size_t>(index.row())].RevenueCorrelation(), 'f', 2);
     case Role::EarningCorrelation:
         return QString::number(_data[static_cast<size_t>(index.row())].EarningCorrelation(), 'f', 2);
     case Role::EarningGrowth:
@@ -293,6 +295,7 @@ QHash<int, QByteArray> TableModel::roleNames() const
     roles[Role::Year] = "year";
     roles[Role::Rate] = "rate";
     roles[Role::Percentage] = "percentage";
+    roles[Role::RevenueCorrelation] = "revenueCorrelation";
     roles[Role::EarningCorrelation] = "earningCorrelation";
     roles[Role::EarningGrowth] = "earningGrowth";
     roles[Role::DividendGrowth] = "dividendGrowth";
@@ -324,21 +327,24 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRank());
             break;
         case 4:
-            std::sort(_data.begin(), _data.end(), orderByEarningCorrelation());
+            //std::sort(_data.begin(), _data.end(), orderByEarningCorrelation());
             break;
         case 5:
-            std::sort(_data.begin(), _data.end(), orderByEarningGrowth());
+            std::sort(_data.begin(), _data.end(), orderByEarningCorrelation());
             break;
         case 6:
-            std::sort(_data.begin(), _data.end(), orderByDividendGrowth());
+            std::sort(_data.begin(), _data.end(), orderByEarningGrowth());
             break;
         case 7:
-            std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
+            std::sort(_data.begin(), _data.end(), orderByDividendGrowth());
             break;
         case 8:
-            std::sort(_data.begin(), _data.end(), orderByType());
+            std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
             break;
         case 9:
+            std::sort(_data.begin(), _data.end(), orderByType());
+            break;
+        case 10:
             std::sort(_data.begin(), _data.end(), orderByRemark());
             break;
         default:
@@ -361,21 +367,24 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRankDescending());
             break;
         case 4:
-            std::sort(_data.begin(), _data.end(), orderByEarningCorrelationDescending());
+            //std::sort(_data.begin(), _data.end(), orderByEarningCorrelationDescending());
             break;
         case 5:
-            std::sort(_data.begin(), _data.end(), orderByEarningGrowthDescending());
+            std::sort(_data.begin(), _data.end(), orderByEarningCorrelationDescending());
             break;
         case 6:
-            std::sort(_data.begin(), _data.end(), orderByDividendGrowthDescending());
+            std::sort(_data.begin(), _data.end(), orderByEarningGrowthDescending());
             break;
         case 7:
-            std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
+            std::sort(_data.begin(), _data.end(), orderByDividendGrowthDescending());
             break;
         case 8:
-            std::sort(_data.begin(), _data.end(), orderByTypeDescending());
+            std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
             break;
         case 9:
+            std::sort(_data.begin(), _data.end(), orderByTypeDescending());
+            break;
+        case 10:
             std::sort(_data.begin(), _data.end(), orderByRemarkDescending());
             break;
         default:
@@ -488,19 +497,19 @@ StockEntity TestDatabase::GetStockBayer()
     StockEntity entity("Bayer");
 
     auto yearData = entity.GetYearData();
-    yearData.push_back(StockEntity::YearDataSet(2007, 2.91, 1.35));
-    yearData.push_back(StockEntity::YearDataSet(2008, 2.2, 1.4));
-    yearData.push_back(StockEntity::YearDataSet(2009, 1.7, 1.4));
-    yearData.push_back(StockEntity::YearDataSet(2010, 1.57, 1.5));
-    yearData.push_back(StockEntity::YearDataSet(2011, 2.99, 1.65));
-    yearData.push_back(StockEntity::YearDataSet(2012, 2.96, 1.9));
-    yearData.push_back(StockEntity::YearDataSet(2013, 3.86, 2.1));
-    yearData.push_back(StockEntity::YearDataSet(2014, 5.59, 2.25));
-    yearData.push_back(StockEntity::YearDataSet(2015, 6.82, 2.5));
-    yearData.push_back(StockEntity::YearDataSet(2016, 6.67, 2.7));
-    yearData.push_back(StockEntity::YearDataSet(2017, 6.64, 2.8));
-    yearData.push_back(StockEntity::YearDataSet(2018, 5.94, 2.8));
-    yearData.push_back(StockEntity::YearDataSet(2019, 6.4, 2.8));
+    yearData.push_back(StockEntity::YearDataSet(2007, 1000, 2.91, 1.35));
+    yearData.push_back(StockEntity::YearDataSet(2008, 1000, 2.2, 1.4));
+    yearData.push_back(StockEntity::YearDataSet(2009, 1000, 1.7, 1.4));
+    yearData.push_back(StockEntity::YearDataSet(2010, 1000, 1.57, 1.5));
+    yearData.push_back(StockEntity::YearDataSet(2011, 1000, 2.99, 1.65));
+    yearData.push_back(StockEntity::YearDataSet(2012, 1000, 2.96, 1.9));
+    yearData.push_back(StockEntity::YearDataSet(2013, 1000, 3.86, 2.1));
+    yearData.push_back(StockEntity::YearDataSet(2014, 1000, 5.59, 2.25));
+    yearData.push_back(StockEntity::YearDataSet(2015, 1000, 6.82, 2.5));
+    yearData.push_back(StockEntity::YearDataSet(2016, 1001, 6.67, 2.7));
+    yearData.push_back(StockEntity::YearDataSet(2017, 1001, 6.64, 2.8));
+    yearData.push_back(StockEntity::YearDataSet(2018, 1001, 5.94, 2.8));
+    yearData.push_back(StockEntity::YearDataSet(2019, 1001, 6.4, 2.8));
     entity.SetYearData(yearData);
 
     return entity;

@@ -171,8 +171,9 @@ private:
 
 	bool Calculate(StockEntity& stock)
 	{
-		if (!SetEarningCorrelationFactor(stock)) return false;
-		if (!SetEarningAndDividendGrowth(stock)) return false;
+        if (!SetEarningCorrelationFactor(stock)) return false;
+        if (!SetRevenueCorrelationFactor(stock)) return false;
+        if (!SetEarningAndDividendGrowth(stock)) return false;
 		if (!SetPayoutRatio(stock)) return false;
 
 		SetNumYearsDividendNotReduced(stock);
@@ -233,6 +234,31 @@ private:
 
     bool SetEarningCorrelationFactor(StockEntity& stock)
     {
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Earnings; };
+        double correlationFactor = 0.0;
+        if(GetCorrelationFactor(stock, lambda, correlationFactor))
+        {
+            stock.SetEarningCorrelation(correlationFactor);
+            return true;
+        }
+        return false;
+    }
+
+    bool SetRevenueCorrelationFactor(StockEntity& stock)
+    {
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Revenue; };
+        double correlationFactor = 0.0;
+        if(GetCorrelationFactor(stock, lambda, correlationFactor))
+        {
+            stock.SetRevenueCorrelation(correlationFactor);
+            return true;
+        }
+        return false;
+    }
+
+    template<typename Functor>
+    bool GetCorrelationFactor(StockEntity& stock, Functor functor, double& outValue)
+    {
         double xDach = 0.0;
         double tDach = 0.0;
         double pXTdach = 0.0;
@@ -250,7 +276,7 @@ private:
         // --- do calculation -------------------------
         for(const auto& item : _list)
         {
-            xDach = xDach + item.Earnings;
+            xDach = xDach + functor(item); //item.Earnings;
             tDach = tDach + item.Year;
         }
         xDach = xDach / _list.size();
@@ -259,7 +285,7 @@ private:
         for(const auto& item : _list)
         {
             auto tmp1 = item.Year - tDach;
-            auto tmp2 = item.Earnings - xDach;
+            auto tmp2 = functor(item) - xDach;//item.Earnings - xDach;
             pXTdach = pXTdach + tmp1 * tmp2;
             dXDachsqrt = dXDachsqrt + tmp2 * tmp2;
             dTDachsqrt = dTDachsqrt + tmp1 * tmp1;
@@ -268,7 +294,7 @@ private:
         if (sqrt(dXDachsqrt) * sqrt(dTDachsqrt) > 0.1)
         {
             r = pXTdach / (sqrt(dXDachsqrt) * sqrt(dTDachsqrt));
-            stock.SetEarningCorrelation(r);
+            outValue = r;// stock.SetEarningCorrelation(r);
         }
         return true;
     }

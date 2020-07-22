@@ -4,12 +4,13 @@
 #include "../stockcheck/idatabase.h"
 
 #include <vector>
-#include <experimental/filesystem>
+
+#include<experimental/filesystem>
 
 class SqliteAccess : public IDatabase
 {
 public:
-    void setDatabasePath(std::experimental::filesystem::path databasePath);
+    void setDatabasePath(std::experimental::filesystem::path path);
 
     std::vector<StockEntity> GetStocks() override final;
 

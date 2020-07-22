@@ -55,6 +55,7 @@ private:
         Year,
         Rate,
         Percentage,
+        RevenueCorrelation,
         EarningCorrelation,
         EarningGrowth,
         DividendGrowth,

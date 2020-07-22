@@ -16,12 +16,13 @@ public:
     class YearDataSet
     {
     public:
+        double Revenue;
         double Dividend{0.0};
         double Earnings{0.0};
         int Year{0};
 
-        YearDataSet(int year, double earning, double dividend) :
-            Dividend{dividend}, Earnings{earning}, Year{year} 
+        YearDataSet(int year, double revenue, double earning, double dividend) :
+            Revenue{revenue}, Dividend{dividend}, Earnings{earning}, Year{year}
         {
         }
 
@@ -113,6 +114,26 @@ public:
         _percentage = value;
     }
 
+    double RevenueCorrelation() const
+    {
+        return _revenueCorrelation;
+    }
+
+    void SetRevenueCorrelation(double value)
+    {
+        _revenueCorrelation = value;
+    }
+
+    double RevenueGrowthThreeYears() const
+    {
+        return _revenueGrowth;
+    }
+
+    void SetRevenueGrowthThreeYears(double value)
+    {
+        _revenueGrowth = value;
+    }
+
     double EarningCorrelation() const
     {
         return _earningCorrelation;
@@ -192,6 +213,8 @@ public:
      StockType _type = StockType::None;
 
      double _percentage{0.0};
+     double _revenueCorrelation{0.0};
+     double _revenueGrowth{0.0};
      double _earningCorrelation{0.0};
      double _earningGrowth{0.0};
      double _dividendGrowth{0.0};
