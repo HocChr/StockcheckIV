@@ -53,6 +53,11 @@ ApplicationWindow {
         }
     }
 
+    function onActualize()
+    {
+        tableModel.onActualize();
+    }
+
     // --- About Dialog ---------------------------------------------------
 
     Dialog {
@@ -180,7 +185,12 @@ Rating C."
 
         }
         Menu {
-            title: qsTr('Info')
+            title: qsTr('Stockcheck')
+            MenuItem{
+                text: "Aktualisieren"
+                shortcut: "F5"
+                onTriggered: onActualize()
+            }
             MenuItem{
                 text: "Beschreibung"
                 onTriggered: aboutDialog.open()

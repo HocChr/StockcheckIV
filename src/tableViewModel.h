@@ -43,6 +43,8 @@ public:
 
     Q_INVOKABLE void onDatabaseChanged(QString databaseNameNew);
 
+    Q_INVOKABLE void onActualize();
+
 private:
 
     void databaseChanged(QString databaseNameNew);
