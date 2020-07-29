@@ -32,6 +32,7 @@ ApplicationWindow {
 
     property LineSeries chartSeriesEarnings
     property LineSeries chartSeriesDividend
+    property LineSeries chartSeriesRevenues
 
     // --- Functions and Actions ------------------------------------------
 
@@ -89,7 +90,7 @@ nach der Dividenden-Aktien-Bewertung erreicht.
 Die Bewertung funktioniert wie folgt. Für jedes zu bewertende Kriterium wird zwischen einer
 unteren und einer oberen Grenze linear interpoliert. D.h. erreicht eine Aktie das Minimum eines
 Kriteriums nicht, erhält sie 0 Punkte. Erreicht die Aktie das Maximum eines Kriteriums, erhält
-sie 100 Punkte. Dazwischen wir interpoliert.
+sie 100 Punkte. Dazwischen wird interpoliert.
 
 Schließlich wird der Mittelwert über die Anzahl der herangezogenen Kriterien ermittelt.
 
@@ -97,21 +98,31 @@ Die Kriterien für eine Wachstumsaktie sind
 
     1. Beträgt die Compound Annual Growth Rate (CAGD) des Gewinns pro Aktie über die letzten 3 Jahre
        0% p.a oder weniger, erhält die Aktie 0 Punkte. Beträgt das CAGD 10% p.a. oder mehr, 100 Punkte.
-    2. Beträgt die Stabilität des Gewinns ist 0.5 oder weniger -> 0 Punkte, bei 1 -> 100 Punkte.
+    2. Beträgt die Stabilität des Gewinns 0.5 oder weniger -> 0 Punkte, bei 1 -> 100 Punkte.
+
+    3. Beträgt die Compound Annual Growth Rate (CAGD) des Umsatzes über die letzten 3 Jahre
+       0% p.a oder weniger, erhält die Aktie 0 Punkte. Beträgt das CAGD 10% p.a. oder mehr, 100 Punkte.
+    4. Beträgt die Stabilität des Umsatzes 0.5 oder weniger -> 0 Punkte, bei 1 -> 100 Punkte.
 
 Die Kriterien für eine Dividendenaktie sind
 
-    1. Beträgt die CAGD des Gewinns pro Aktie über die letzten 3 Jahre beträgt 0% p.a oder weniger -> 0 Punkte.
+    1. Beträgt die CAGD des Gewinns pro Aktie über die letzten 3 Jahre 0% p.a oder weniger -> 0 Punkte.
        Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
     2. Beträgt die Stabilität des Gewinns 0.0 oder weniger -> 0 Punkte, beträgt sie 1 -> 100 Punkte.
-    3. Die Anzahl der Jahre ohne Dividendenkürzung ist mindestens 0 -> 0 Punkte. 10 Jahre oder mehr -> 100 Punkte.
-    4. Beträgt die CAGD des Dividende pro Aktie über die letzten 3 Jahre beträgt 0% p.a oder weniger -> 0 Punkte.
+
+    3. Beträgt die CAGD des Umsatzes über die letzten 3 Jahre 0% p.a oder weniger -> 0 Punkte.
        Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
-    5. Die Auschüttungsquote wird zu 100% erreicht, wenn sie innerhalb [40%, 60%] liegt.
+    4. Beträgt die Stabilität des Umsatzes 0.0 oder weniger -> 0 Punkte, beträgt sie 1 -> 100 Punkte.
+
+    5. Die Anzahl der Jahre ohne Dividendenkürzung ist mindestens 0 -> 0 Punkte. 10 Jahre oder mehr -> 100 Punkte.
+    6. Beträgt die CAGD des Dividende pro Aktie über die letzten 3 Jahre beträgt 0% p.a oder weniger -> 0 Punkte.
+       Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
+
+    7. Die Auschüttungsquote wird zu 100% erreicht, wenn sie innerhalb [40%, 60%] liegt.
        Darüber/darunter wird linear bis auf 100%/0% interpoliert.
 
 Erreicht eine Aktie mindestens 50 Punkte als als Wachstumsaktie oder Dividendenaktie, erhält sie
-das Rating B. Erhält sie mindestens 80 Punkte, erhält sie das Rating A. Ansonsten erhält sie das
+das Rating B. Erhält sie mindestens 75 Punkte, erhält sie das Rating A. Ansonsten erhält sie das
 Rating C."
                 font.pixelSize: 12
             }
@@ -156,18 +167,25 @@ Rating C."
 
         chartSeriesEarnings = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Gewinn/Aktie", xAxis, yAxis);
         chartSeriesDividend = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Dividende/Aktie", xAxis, yAxis);
+        chartSeriesRevenues = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Umsatz", xAxis, axisY2);
 
-        tableModel.getLineSeries(tablename,
-                                 chartSeriesEarnings,
-                                 chartSeriesDividend,
-                                 xAxis,
-                                 yAxis);
+        tableModel.getLineSeriesPerShare(tablename,
+                                         chartSeriesEarnings,
+                                         chartSeriesDividend,
+                                         xAxis,
+                                         yAxis);
+
+        tableModel.getLineSeriesRevenue(tablename,
+                                        chartSeriesRevenues,
+                                        axisY2);
 
         chartSeriesDividend.color = "blue"
         chartSeriesEarnings.color = "green"
+        chartSeriesRevenues.color = "grey"
 
         chartSeriesDividend.width = 5
         chartSeriesEarnings.width = 5
+        chartSeriesRevenues.width = 5
 
         chartViewBig.title = tableModel.getTableName(tablename);
 
@@ -260,6 +278,12 @@ Rating C."
                 movable: false
             }
             TableViewColumn {
+                role: "revenueGrowth"
+                title: "Umsatzwachstum"
+                width: 120
+                movable: false
+            }
+            TableViewColumn {
                 role: "earningCorrelation"
                 title: "Gewinnkorrelation"
                 width: 120
@@ -325,7 +349,13 @@ Rating C."
                     },
                     ValueAxis{
                         id: yAxis
+                        color: "green"
+                    },
+                    ValueAxis {
+                        id: axisY2
+                        color: "gray"
                     }
+
                 ]
             }
         }

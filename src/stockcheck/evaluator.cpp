@@ -29,7 +29,7 @@ public:
 private:
 
     double _minHold = 0.5;
-    double _minBuy = 0.8;
+    double _minBuy = 0.75;
 
 	void doRating(StockEntity& stock)
 	{
@@ -50,10 +50,20 @@ private:
     {
         double percentage = 0.0, percentageTmp = 0.0;
 
+        percentageTmp = PercentageOfRevenueCorrelation(stock, 0.5);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Umsatzkorelationkorrelation gering");
+        percentage = percentageTmp;
+
+        percentageTmp = PercentageOfRevenueGrowth(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Umsatzwachstumwachstum gering");
+        percentage += percentageTmp;
+
         percentageTmp = PercentageOfEarningCorrelation(stock, 0.5);
         if (percentageTmp < _minHold)
             stock.AddRemark("Gewinnkorrelation gering");
-        percentage = percentageTmp;
+        percentage += percentageTmp;
 
         percentageTmp = PercentageOfEarningGrowth(stock, 10.0);
         if (percentageTmp < _minHold)
@@ -63,17 +73,27 @@ private:
         if(percentage > _minHold)
             stock.SetStockType(StockEntity::StockType::GrowthStock);
 
-        stock.SetPercentag(100.0 * percentage / 2.0);
+        stock.SetPercentag(100.0 * percentage / 4.0);
     }
 
     void EvaluateDividendStock(StockEntity& stock)
     {
         double percentage = 0.0, percentageTmp = 0.0;
 
+        percentageTmp = PercentageOfRevenueCorrelation(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Umsatzkorrelation gering");
+        percentage = percentageTmp;
+
+        percentageTmp = PercentageOfRevenueGrowth(stock);
+        if (percentageTmp < _minHold)
+            stock.AddRemark("Umsatzwachstumwachstum gering");
+        percentage += percentageTmp;
+
         percentageTmp = PercentageOfEarningCorrelation(stock);
         if (percentageTmp < _minHold)
             stock.AddRemark("Gewinnkorrelation gering");
-        percentage = percentageTmp;
+        percentage += percentageTmp;
 
         percentageTmp = PercentageOfEarningGrowth(stock);
         if (percentageTmp < _minHold)
@@ -95,13 +115,29 @@ private:
             stock.AddRemark("Auschüttungsquote nicht gut");
         percentage += percentageTmp;
 
-        if(percentage > _minHold)
+        double percentageReached = 100.0 * percentage / 7.0;
+
+        if(percentageReached > _minHold * 100.0)
             stock.SetStockType(StockEntity::StockType::DivididendStock);
 
-        stock.SetPercentag(100.0 * percentage / 5.0);
+        stock.SetPercentag(percentageReached);
     }
 
-    double PercentageOfEarningCorrelation(const StockEntity& stock, double minimalCorrelation = 0.0)
+    double PercentageOfRevenueCorrelation(const StockEntity& stock, double minimalCorrelation = 0.4)
+    {
+        double maximalCorrelation = 1.0;
+
+        return CalcPercentage(minimalCorrelation, maximalCorrelation, stock.RevenueCorrelation());
+    }
+
+    double PercentageOfRevenueGrowth(const StockEntity& stock, double maximalGrowth = 5.0)
+    {
+        double minimalGrowth = 0.0;
+
+        return CalcPercentage(minimalGrowth, maximalGrowth, stock.RevenueGrowthThreeYears());
+    }
+
+    double PercentageOfEarningCorrelation(const StockEntity& stock, double minimalCorrelation = 0.4)
     {
         double maximalCorrelation = 1.0;
 
@@ -173,7 +209,7 @@ private:
 	{
         if (!SetEarningCorrelationFactor(stock)) return false;
         if (!SetRevenueCorrelationFactor(stock)) return false;
-        if (!SetEarningAndDividendGrowth(stock)) return false;
+        if (!SeGrowths(stock)) return false;
 		if (!SetPayoutRatio(stock)) return false;
 
 		SetNumYearsDividendNotReduced(stock);
@@ -184,11 +220,14 @@ private:
     void SetNumYearsDividendNotReduced(StockEntity& stock)
     {
         int numYears = 0;
-        for (size_t i = 1; i < stock.GetYearData().size(); i++)
+        for (size_t i = stock.GetYearData().size() - 1; i > 0; i--)
         {
-            if (stock.GetYearData()[i - 1].Dividend <= stock.GetYearData()[i].Dividend)
+            if (stock.GetYearData()[i].Dividend >= stock.GetYearData()[i - 1].Dividend)
             {
                 numYears++;
+            }
+            else {
+                break;
             }
         }
         stock.SetNumYearsDividendNotReduced(numYears);
@@ -215,7 +254,7 @@ private:
         return true;
     }
 
-    bool SetEarningAndDividendGrowth(StockEntity& stock)
+    bool SeGrowths(StockEntity& stock)
     {
         if (stock.GetYearData().size() < 6) return false;
 
@@ -228,6 +267,11 @@ private:
         x0 = stock.GetYearData()[stock.GetYearData().size() - 4].Dividend;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
         stock.SetDividendGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
+
+        // calculate three years revenue growth
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 4].Revenue;
+        x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
+        stock.SetRevenueGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
 
         return true;
     }
@@ -273,6 +317,7 @@ private:
             stock.AddRemark("Korrelationsberechnung: Abbruch. Zu wenig Daten");
             return false;
         }
+
         // --- do calculation -------------------------
         for(const auto& item : _list)
         {
@@ -281,6 +326,7 @@ private:
         }
         xDach = xDach / _list.size();
         tDach = tDach / _list.size();
+
         // --------------------------------------------
         for(const auto& item : _list)
         {
@@ -290,6 +336,7 @@ private:
             dXDachsqrt = dXDachsqrt + tmp2 * tmp2;
             dTDachsqrt = dTDachsqrt + tmp1 * tmp1;
         }
+
         // --------------------------------------------
         if (sqrt(dXDachsqrt) * sqrt(dTDachsqrt) > 0.1)
         {

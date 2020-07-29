@@ -33,11 +33,15 @@ public:
 
     Q_INVOKABLE virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    Q_INVOKABLE void getLineSeries(int rowId,
-                                   QLineSeries* lineSeriesEarnings,
-                                   QLineSeries* lineSeriesDividends,
-                                   QValueAxis* xAxis,
-                                   QValueAxis* yAxis);
+    Q_INVOKABLE void getLineSeriesPerShare(int rowId,
+                                           QLineSeries* lineSeriesEarnings,
+                                           QLineSeries* lineSeriesDividends,
+                                           QValueAxis* xAxis,
+                                           QValueAxis* yAxis);
+
+    Q_INVOKABLE void getLineSeriesRevenue(int rowId,
+                                          QLineSeries* lineSeriesRevenues,
+                                          QValueAxis* yAxis);
 
     Q_INVOKABLE QString getTableName(int rowId);
 
@@ -58,6 +62,7 @@ private:
         Rate,
         Percentage,
         RevenueCorrelation,
+        RevenueGrowth,
         EarningCorrelation,
         EarningGrowth,
         DividendGrowth,
