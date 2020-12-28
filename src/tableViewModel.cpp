@@ -99,7 +99,7 @@ struct orderByRevenueCorrelation
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.RevenueCorrelation() < ent2.RevenueCorrelation());
+        return (ent1.RevenueStability() < ent2.RevenueStability());
     }
 };
 
@@ -107,7 +107,7 @@ struct orderByRevenueCorrelationDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.RevenueCorrelation() > ent2.RevenueCorrelation());
+        return (ent1.RevenueStability() > ent2.RevenueStability());
     }
 };
 
@@ -131,7 +131,7 @@ struct orderByEarningCorrelation
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.EarningCorrelation() < ent2.EarningCorrelation());
+        return (ent1.EarningStability() < ent2.EarningStability());
     }
 };
 
@@ -139,7 +139,7 @@ struct orderByEarningCorrelationDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.EarningCorrelation() > ent2.EarningCorrelation());
+        return (ent1.EarningStability() > ent2.EarningStability());
     }
 };
 
@@ -270,15 +270,17 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     case Role::Percentage:
         return QString::number(_data[static_cast<size_t>(index.row())].Percentage(), 'f', 0);
     case Role::RevenueCorrelation:
-        return QString::number(_data[static_cast<size_t>(index.row())].RevenueCorrelation(), 'f', 2);
+        return QString::number(_data[static_cast<size_t>(index.row())].RevenueStability(), 'f', 0);
     case Role::RevenueGrowth:
         return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthThreeYears(), 'f', 2);
     case Role::EarningCorrelation:
-        return QString::number(_data[static_cast<size_t>(index.row())].EarningCorrelation(), 'f', 2);
+        return QString::number(_data[static_cast<size_t>(index.row())].EarningStability(), 'f', 0);
     case Role::EarningGrowth:
         return QString::number(_data[static_cast<size_t>(index.row())].EarningGrowthThreeYears(), 'f', 1);
     case Role::DividendGrowth:
         return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthThreeYears(), 'f', 1);
+    case Role::DividendStability:
+        return QString::number(_data[static_cast<size_t>(index.row())].DividendStability(), 'f', 0);
     case Role::PayoutRatio:
         return QString::number(_data[static_cast<size_t>(index.row())].PayoutRatio(), 'f', 0);
      case Role::Remark:
@@ -299,9 +301,9 @@ QHash<int, QByteArray> TableModel::roleNames() const
     roles[Role::RevenueGrowth] = "revenueGrowth";
     roles[Role::EarningCorrelation] = "earningCorrelation";
     roles[Role::EarningGrowth] = "earningGrowth";
+    roles[Role::DividendStability] = "dividendStability";
     roles[Role::DividendGrowth] = "dividendGrowth";
     roles[Role::PayoutRatio] = "payoutRatio";
-    roles[Role::StockType] = "stockType";
     roles[Role::Remark] = "remark";
     return roles;
 }
@@ -342,10 +344,10 @@ void TableModel::sort(int column, Qt::SortOrder order)
         case 8:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowth());
             break;
-        case 9:
+        case 10:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
             break;
-        case 10:
+        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemark());
             break;
         default:
@@ -382,10 +384,10 @@ void TableModel::sort(int column, Qt::SortOrder order)
         case 8:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowthDescending());
             break;
-        case 9:
+        case 10:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
             break;
-        case 10:
+        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemarkDescending());
             break;
         default:

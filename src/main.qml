@@ -267,13 +267,13 @@ Rating C."
             }
             TableViewColumn {
                 role: "percentage"
-                title: "Punkte"
-                width: 60
+                title: "Punkte von 20"
+                width: 90
                 movable: false
             }
             TableViewColumn {
                 role: "revenueCorrelation"
-                title: "Umsatzkorrelation"
+                title: "Umsatzstabilität"
                 width: 120
                 movable: false
             }
@@ -285,7 +285,7 @@ Rating C."
             }
             TableViewColumn {
                 role: "earningCorrelation"
-                title: "Gewinnkorrelation"
+                title: "Gewinnstabilität"
                 width: 120
                 movable: false
             }
@@ -298,6 +298,12 @@ Rating C."
             TableViewColumn {
                 role: "dividendGrowth"
                 title: "Dividendenwachstum"
+                width: 120
+                movable: false
+            }
+            TableViewColumn {
+                role: "dividendStability"
+                title: "Dividendenstabilität"
                 width: 120
                 movable: false
             }

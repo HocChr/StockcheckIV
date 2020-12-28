@@ -2,6 +2,10 @@
 #include <algorithm>
 #include <math.h>       /* sqrt */
 
+static const unsigned numYears = 5;
+
+int GetNumYearsDividendReduced(const StockEntity& stock);
+int getPointsOfPayoutRatio(const StockEntity& stock);
 
 class Evaluator
 {
@@ -24,17 +28,17 @@ public:
 
 private:
 
-    double _minHold = 0.5;
-    double _minBuy = 0.75;
+    double _minHold = 10;
+    double _minBuy = 16;
 
 	void doRating(StockEntity& stock)
 	{
-        if (stock.Percentage() >= _minBuy * 100.0)
+        if (stock.Percentage() >= _minBuy)
 		{
             stock.SetRating(StockEntity::Rate::A);
             return;
 		}
-        else if (stock.Percentage() >= _minHold * 100.0)
+        else if (stock.Percentage() >= _minHold)
 		{
             stock.SetRating(StockEntity::Rate::B);
             return;
@@ -44,170 +48,62 @@ private:
 
     void EvaluateStock(StockEntity& stock)
     {
-        double percentage = 0.0, percentageTmp = 0.0;
+        int score = stock.RevenueStability();
+        if (score <= 3)
+            stock.AddRemark("Umsatzstabilität gering");
 
-        percentageTmp = PercentageOfRevenueCorrelation(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Umsatzkorrelation gering");
-        percentage = percentageTmp;
+        int scoreTmp = stock.EarningStability();
+        if (scoreTmp <= 3)
+            stock.AddRemark("Gewinnstabilität gering");
+        score += scoreTmp;
 
-        percentageTmp = PercentageOfRevenueGrowth(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Umsatzwachstumwachstum gering");
-        percentage += percentageTmp;
+        stock.SetDividendStability(stock.DividendStability() - GetNumYearsDividendReduced(stock));
+        scoreTmp = stock.DividendStability();
+        if (scoreTmp <= 3)
+            stock.AddRemark("Dividendentabilität gering");
+        score += scoreTmp;
 
-        percentageTmp = PercentageOfEarningCorrelation(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Gewinnkorrelation gering");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfEarningGrowth(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Gewinnwachstum gering");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfDividendGrowth(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Dividendenwachstum gering");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfDividendYearsNotCutted(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Dividende nicht stabil");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfPayoutRatio(stock);
-        if (percentageTmp < _minHold)
+        scoreTmp = getPointsOfPayoutRatio(stock);
+        if (scoreTmp <= 3)
             stock.AddRemark("Auschüttungsquote nicht gut");
-        percentage += percentageTmp;
+        score += scoreTmp;
 
-        double percentageReached = 100.0 * percentage / 7.0;
-
-        stock.SetPercentag(percentageReached);
+        stock.SetPercentag(score);
     }
-
-    double PercentageOfRevenueCorrelation(const StockEntity& stock, double minimalCorrelation = 0.4)
-    {
-        double maximalCorrelation = 1.0;
-
-        return CalcPercentage(minimalCorrelation, maximalCorrelation, stock.RevenueCorrelation());
-    }
-
-    double PercentageOfRevenueGrowth(const StockEntity& stock, double maximalGrowth = 5.0)
-    {
-        double minimalGrowth = 0.0;
-
-        return CalcPercentage(minimalGrowth, maximalGrowth, stock.RevenueGrowthThreeYears());
-    }
-
-    double PercentageOfEarningCorrelation(const StockEntity& stock, double minimalCorrelation = 0.4)
-    {
-        double maximalCorrelation = 1.0;
-
-        return CalcPercentage(minimalCorrelation, maximalCorrelation, stock.EarningCorrelation());
-    }
-
-    double PercentageOfEarningGrowth(const StockEntity& stock, double maximalGrowth = 5.0)
-    {
-        double minimalGrowth = 0.0;
-
-        return CalcPercentage(minimalGrowth, maximalGrowth, stock.EarningGrowthThreeYears());
-    }
-
-    double PercentageOfDividendGrowth(const StockEntity& stock)
-    {
-        double minimalGrowth = 0.0;
-        double maximalGrowth = 5.0;
-
-        return CalcPercentage(minimalGrowth, maximalGrowth, stock.DividendGrowthThreeYears());
-    }
-
-    double PercentageOfDividendYearsNotCutted(const StockEntity& stock)
-    {
-        int minimalYears = 0;
-        int maximalYears = 10;
-
-        return CalcPercentage(minimalYears, maximalYears, stock.NumYearsDividendNotReduced());
-    }
-
-    double PercentageOfPayoutRatio(StockEntity& stock)
-    {
-        auto percentage0 = CalcPercentage(0.0, 40.0, stock.PayoutRatio());
-        auto percentage1 = 1.0 - CalcPercentage(60.0, 100.0, stock.PayoutRatio());
-
-        auto best = std::min(percentage0, percentage1);
-        return best;
-    }
-
-	double CalcPercentage(double minExpected, double maxExpected, double actualValue)
-	{
-		if (actualValue <= minExpected)
-		{
-			return 0.0;
-		}
-		else if (actualValue >= maxExpected)
-		{
-			return 1.0;
-		}
-		else if ((maxExpected - minExpected) < 1.0e-6)
-		{
-			return 0.0;
-		}
-		else
-		{
-			double m = 1.0 / (maxExpected - minExpected);
-			return m * actualValue - m * minExpected;
-		}
-	}
 
     // --- functions for calculating ---------------------------------------
 
-    bool isNoDividendStock(const StockEntity& stock)
-    {
-        return stock.PayoutRatio() < 0.1 &&
-            stock.NumYearsDividendNotReduced() == static_cast<int>(stock.GetYearData().size()) - 1;
-    }
-
-	bool Calculate(StockEntity& stock)
-	{
-        if (!SetEarningCorrelationFactor(stock)) return false;
-        if (!SetRevenueCorrelationFactor(stock)) return false;
-        if (!SeGrowths(stock)) return false;
+    bool Calculate(StockEntity& stock)
+	{        
+        if (stock.GetYearData().size() < numYears)
+        {
+            return false;
+        }
+        if (!SetEarningStability(stock)) return false;
+        if (!SetRevenueStability(stock)) return false;
+        if (!SetDividendStability(stock)) return false;
+        if (!SetGrowths(stock)) return false;
 		if (!SetPayoutRatio(stock)) return false;
-
-		SetNumYearsDividendNotReduced(stock);
 
 		return true;
 	}
 
-    void SetNumYearsDividendNotReduced(StockEntity& stock)
-    {
-        int numYears = 0;
-        for (size_t i = stock.GetYearData().size() - 1; i > 0; i--)
-        {
-            if (stock.GetYearData()[i].Dividend >= stock.GetYearData()[i - 1].Dividend)
-            {
-                numYears++;
-            }
-            else {
-                break;
-            }
-        }
-        stock.SetNumYearsDividendNotReduced(numYears);
-    }
-    
     bool SetPayoutRatio(StockEntity& stock)
     {
         // calculates the "cumulated" payout ratio
-        if (stock.GetYearData().size() < 3) return false;
+        if (stock.GetYearData().size() < 5) return false;
 
-        double sumEarnings = stock.GetYearData()[stock.GetYearData().size() - 3].Earnings
-            + stock.GetYearData()[stock.GetYearData().size() - 2].Earnings
-            + stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
+        double sumEarnings = stock.GetYearData()[stock.GetYearData().size() - 5].Earnings
+                + stock.GetYearData()[stock.GetYearData().size() - 4].Earnings
+                + stock.GetYearData()[stock.GetYearData().size() - 3].Earnings
+                + stock.GetYearData()[stock.GetYearData().size() - 2].Earnings
+                + stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
 
-        double sumDividends = stock.GetYearData()[stock.GetYearData().size() - 3].Dividend
-            + stock.GetYearData()[stock.GetYearData().size() - 2].Dividend
-            + stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
+        double sumDividends = stock.GetYearData()[stock.GetYearData().size() - 5].Dividend
+                + stock.GetYearData()[stock.GetYearData().size() - 4].Dividend
+                + stock.GetYearData()[stock.GetYearData().size() - 3].Dividend
+                + stock.GetYearData()[stock.GetYearData().size() - 2].Dividend
+                + stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
 
         if (sumEarnings > 1.0e-6)
         {
@@ -217,7 +113,7 @@ private:
         return true;
     }
 
-    bool SeGrowths(StockEntity& stock)
+    bool SetGrowths(StockEntity& stock)
     {
         if (stock.GetYearData().size() < 6) return false;
 
@@ -239,73 +135,59 @@ private:
         return true;
     }
 
-    bool SetEarningCorrelationFactor(StockEntity& stock)
+    bool SetEarningStability(StockEntity& stock)
     {
         auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Earnings; };
-        double correlationFactor = 0.0;
-        if(GetCorrelationFactor(stock, lambda, correlationFactor))
+        int stability = 0;
+        if(GetCorrelationFactor(stock, lambda, stability))
         {
-            stock.SetEarningCorrelation(correlationFactor);
+            stock.SetEarningStability(stability);
             return true;
         }
         return false;
     }
 
-    bool SetRevenueCorrelationFactor(StockEntity& stock)
+    bool SetRevenueStability(StockEntity& stock)
     {
         auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Revenue; };
-        double correlationFactor = 0.0;
-        if(GetCorrelationFactor(stock, lambda, correlationFactor))
+        int stability = 0;
+        if(GetCorrelationFactor(stock, lambda, stability))
         {
-            stock.SetRevenueCorrelation(correlationFactor);
+            stock.SetRevenueStability(stability);
+            return true;
+        }
+        return false;
+    }
+
+    bool SetDividendStability(StockEntity& stock)
+    {
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Dividend; };
+        int stability = 0;
+        if(GetCorrelationFactor(stock, lambda, stability))
+        {
+            stock.SetDividendStability(stability);
             return true;
         }
         return false;
     }
 
     template<typename Functor>
-    bool GetCorrelationFactor(StockEntity& stock, Functor functor, double& outValue)
+    bool GetCorrelationFactor(StockEntity& stock, Functor functor, int& outValue)
     {
-        double xDach = 0.0;
-        double tDach = 0.0;
-        double pXTdach = 0.0;
-        double dXDachsqrt = 0.0;
-        double dTDachsqrt = 0.0;
-        double r = -1.0;
+        double growthThreshold = 1.0;
 
-        // ---- Prepare and check ---------------------
-        auto _list = stock.GetYearData();
-        if (_list.size() == 0)
-        {
-            stock.AddRemark("Korrelationsberechnung: Abbruch. Zu wenig Daten");
-            return false;
+        auto yearDataSet = stock.GetYearData();
+        unsigned startYear = yearDataSet.size() - (numYears + 1);
+
+        int counter = 0;
+        for (auto i = startYear; i < yearDataSet.size() - 1; i++) {
+            auto growth = std::abs(functor(yearDataSet[i])) > 0.0001 ?
+                                       (functor(yearDataSet[i + 1]) / functor(yearDataSet[i])) - 1 : 0.0;
+            growth *= 100.0;
+            counter += growth > growthThreshold ? 1 : 0;
         }
 
-        // --- do calculation -------------------------
-        for(const auto& item : _list)
-        {
-            xDach = xDach + functor(item); //item.Earnings;
-            tDach = tDach + item.Year;
-        }
-        xDach = xDach / _list.size();
-        tDach = tDach / _list.size();
-
-        // --------------------------------------------
-        for(const auto& item : _list)
-        {
-            auto tmp1 = item.Year - tDach;
-            auto tmp2 = functor(item) - xDach;//item.Earnings - xDach;
-            pXTdach = pXTdach + tmp1 * tmp2;
-            dXDachsqrt = dXDachsqrt + tmp2 * tmp2;
-            dTDachsqrt = dTDachsqrt + tmp1 * tmp1;
-        }
-
-        // --------------------------------------------
-        if (sqrt(dXDachsqrt) * sqrt(dTDachsqrt) > 0.1)
-        {
-            r = pXTdach / (sqrt(dXDachsqrt) * sqrt(dTDachsqrt));
-            outValue = r;// stock.SetEarningCorrelation(r);
-        }
+        outValue = counter;
         return true;
     }
 
@@ -331,6 +213,38 @@ private:
         return cagr * 100.0;
     }
 };
+
+int GetNumYearsDividendReduced(const StockEntity& stock)
+{
+    int yearCounter = 0;
+    for (size_t i = stock.GetYearData().size() - numYears; i < stock.GetYearData().size(); ++i)
+    {
+        if (stock.GetYearData()[i].Dividend < stock.GetYearData()[i - 1].Dividend)
+        {
+            yearCounter++;
+        }
+    }
+    return yearCounter;
+}
+
+int getPointsOfPayoutRatio(const StockEntity& stock)
+{
+    double payout = stock.PayoutRatio();
+    int point = 0;
+
+    if(payout >= 30.0 && payout <= 70.0)
+        point++;
+    if(payout >= 20.0 && payout <= 80.0)
+        point++;
+    if(payout >= 15.0 && payout <= 85.0)
+        point++;
+    if(payout >= 10.0 && payout <= 90.0)
+        point++;
+    if(payout >= 5.0 && payout <= 95.0)
+        point++;
+
+    return point;
+}
 
 void CalculateAndEvaluate(std::vector<StockEntity>& stocks)
 {

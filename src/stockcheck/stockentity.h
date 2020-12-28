@@ -43,30 +43,6 @@ public:
     {
     }
 
-    //StockEntity()= delete;
-
-    //StockEntity(const StockEntity& other)
-    //{
-    //    this->_name = other._name;
-    //}
-    //
-    //StockEntity(StockEntity&& other)
-    //{
-    //    std::move(other);
-    //}
-    //
-    //StockEntity& operator=(const StockEntity& other)
-    //{
-    //    this->_name = other._name;
-    //    return *this;
-    //}
-    //
-    //StockEntity& operator=(StockEntity&& other)
-    //{
-    //    std::move(other);
-    //    return *this;
-    //}
-
     Rate Rating() const
     {
         return _rating;
@@ -97,14 +73,14 @@ public:
         _percentage = value;
     }
 
-    double RevenueCorrelation() const
+    int RevenueStability() const
     {
-        return _revenueCorrelation;
+        return _revenueStability;
     }
 
-    void SetRevenueCorrelation(double value)
+    void SetRevenueStability(int value)
     {
-        _revenueCorrelation = value;
+        _revenueStability = value;
     }
 
     double RevenueGrowthThreeYears() const
@@ -117,14 +93,14 @@ public:
         _revenueGrowth = value;
     }
 
-    double EarningCorrelation() const
+    int EarningStability() const
     {
-        return _earningCorrelation;
+        return _earningStability;
     }
 
-    void SetEarningCorrelation(double value)
+    void SetEarningStability(int value)
     {
-        _earningCorrelation = value;
+        _earningStability = value;
     }
 
     double EarningGrowthThreeYears() const
@@ -147,6 +123,16 @@ public:
         _dividendGrowth = value;
     }
 
+    int DividendStability() const
+    {
+        return _dividendStability;
+    }
+
+    void SetDividendStability(int value)
+    {
+        _dividendStability = value;
+    }
+
     double PayoutRatio() const
     {
         return _payoutRatio;
@@ -155,16 +141,6 @@ public:
     void SetPayoutRatio(double value)
     {
         _payoutRatio = value;
-    }
-
-    int NumYearsDividendNotReduced() const
-    {
-        return _numYearsDividendNotReduced;
-    }
-
-    void SetNumYearsDividendNotReduced(int value)
-    {
-        _numYearsDividendNotReduced = value;
     }
 
     const std::vector<YearDataSet>& GetYearData() const
@@ -195,14 +171,13 @@ public:
      Rate _rating = Rate::C;
 
      double _percentage{0.0};
-     double _revenueCorrelation{0.0};
+     int _revenueStability{0};
      double _revenueGrowth{0.0};
-     double _earningCorrelation{0.0};
+     int _earningStability{0};
      double _earningGrowth{0.0};
+     int _dividendStability{0};
      double _dividendGrowth{0.0};
      double _payoutRatio{0.0};
-
-     int _numYearsDividendNotReduced{0};
 };
 
 #endif // STOCKENTITY_H

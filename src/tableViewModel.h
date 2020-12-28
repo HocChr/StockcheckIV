@@ -66,8 +66,8 @@ private:
         EarningCorrelation,
         EarningGrowth,
         DividendGrowth,
+        DividendStability,
         PayoutRatio,
-        StockType,
         Remark
     };
 
