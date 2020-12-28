@@ -308,12 +308,6 @@ Rating C."
                 movable: false
             }
             TableViewColumn {
-                role: "stockType"
-                title: "Kategorie"
-                width: 120
-                movable: false
-            }
-            TableViewColumn {
                 role: "remark"
                 title: "Bemerkung"
                 width: 250

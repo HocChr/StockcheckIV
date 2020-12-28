@@ -210,26 +210,6 @@ struct orderByRemarkDescending
     }
 };
 
-struct orderByType
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.Type() < ent2.Type());
-    }
-};
-
-struct orderByTypeDescending
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        auto lhs = ent1.Type();
-        auto rhs = ent2.Type();
-
-        return (lhs > rhs);
-    }
-};
-
-
 // -------------------------------------------------------
 // --- Test Database -------------------------------------
 // -------------------------------------------------------
@@ -301,19 +281,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthThreeYears(), 'f', 1);
     case Role::PayoutRatio:
         return QString::number(_data[static_cast<size_t>(index.row())].PayoutRatio(), 'f', 0);
-    case Role::StockType:
-    {
-        switch (_data[static_cast<size_t>(index.row())].Type())
-        {
-        case StockEntity::StockType::None:
-            return QString("Nix");
-        case StockEntity::StockType::GrowthStock:
-            return QString("Wachstum");
-        case StockEntity::StockType::DivididendStock:
-            return QString("Dividende");
-        }
-    }
-    case Role::Remark:
+     case Role::Remark:
         return QString::fromStdString(_data[static_cast<size_t>(index.row())].GetRemarks());
     default:
         return QString("Not supposed to happen");
@@ -378,9 +346,6 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
             break;
         case 10:
-            std::sort(_data.begin(), _data.end(), orderByType());
-            break;
-        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemark());
             break;
         default:
@@ -421,9 +386,6 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
             break;
         case 10:
-            std::sort(_data.begin(), _data.end(), orderByTypeDescending());
-            break;
-        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemarkDescending());
             break;
         default:

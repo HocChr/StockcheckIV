@@ -17,11 +17,7 @@ public:
                 continue;
             }
 
-            if(isNoDividendStock(stock))
-                EvaluateGrowthStock(stock);
-            else
-                EvaluateDividendStock(stock);
-
+            EvaluateStock(stock);
             doRating(stock);
         }
     }
@@ -46,37 +42,7 @@ private:
 		stock.SetRating(StockEntity::Rate::C);
     }
 
-    void EvaluateGrowthStock(StockEntity& stock)
-    {
-        double percentage = 0.0, percentageTmp = 0.0;
-
-        percentageTmp = PercentageOfRevenueCorrelation(stock, 0.5);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Umsatzkorelationkorrelation gering");
-        percentage = percentageTmp;
-
-        percentageTmp = PercentageOfRevenueGrowth(stock);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Umsatzwachstumwachstum gering");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfEarningCorrelation(stock, 0.5);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Gewinnkorrelation gering");
-        percentage += percentageTmp;
-
-        percentageTmp = PercentageOfEarningGrowth(stock, 10.0);
-        if (percentageTmp < _minHold)
-            stock.AddRemark("Gewinnwachstum gering");
-        percentage += percentageTmp;
-
-        if(percentage > _minHold)
-            stock.SetStockType(StockEntity::StockType::GrowthStock);
-
-        stock.SetPercentag(100.0 * percentage / 4.0);
-    }
-
-    void EvaluateDividendStock(StockEntity& stock)
+    void EvaluateStock(StockEntity& stock)
     {
         double percentage = 0.0, percentageTmp = 0.0;
 
@@ -116,9 +82,6 @@ private:
         percentage += percentageTmp;
 
         double percentageReached = 100.0 * percentage / 7.0;
-
-        if(percentageReached > _minHold * 100.0)
-            stock.SetStockType(StockEntity::StockType::DivididendStock);
 
         stock.SetPercentag(percentageReached);
     }

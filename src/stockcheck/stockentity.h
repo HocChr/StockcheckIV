@@ -16,7 +16,7 @@ public:
     class YearDataSet
     {
     public:
-        double Revenue;
+        double Revenue{0.0};
         double Dividend{0.0};
         double Earnings{0.0};
         int Year{0};
@@ -37,13 +37,6 @@ public:
         A = 0,
         B,
         C
-    };
-
-    enum class StockType
-    {
-        None = 0,
-        DivididendStock,
-        GrowthStock
     };
 
     StockEntity(std::string name) : _name(std::move(name))
@@ -82,16 +75,6 @@ public:
     void SetRating(Rate value)
     {
         _rating = value;
-    }
-
-    StockType Type() const
-    {
-        return _type;
-    }
-
-    void SetStockType(StockType value)
-    {
-        _type = value;
     }
 
     std::string Name() const
@@ -210,7 +193,6 @@ public:
      std::string _name = "";
      std::string _remarks = "";
      Rate _rating = Rate::C;
-     StockType _type = StockType::None;
 
      double _percentage{0.0};
      double _revenueCorrelation{0.0};
