@@ -118,17 +118,17 @@ private:
         if (stock.GetYearData().size() < 6) return false;
 
         // calculate three years earnings growth
-        auto x0 = stock.GetYearData()[stock.GetYearData().size() - 4].Earnings;
+        auto x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Earnings;
         auto x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
         stock.SetEarningGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
 
         // calculate three years dividend growth
-        x0 = stock.GetYearData()[stock.GetYearData().size() - 4].Dividend;
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Dividend;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
         stock.SetDividendGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
 
         // calculate three years revenue growth
-        x0 = stock.GetYearData()[stock.GetYearData().size() - 4].Revenue;
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Revenue;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
         stock.SetRevenueGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
 
