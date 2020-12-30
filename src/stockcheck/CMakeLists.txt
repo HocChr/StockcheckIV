@@ -1,10 +1,9 @@
 
-set(STOCKCHECK_SOURCE
+set(STOCKCHECK_SOURCES
    evaluator.cpp
 
 )
 set(STOCKCHECK_HEADERS
-   evaluator.cpp
    idatabase.h
    stockcheck.h
    stockentity.h

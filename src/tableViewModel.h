@@ -5,6 +5,7 @@
 #include <qqml.h>
 #include <QtQml>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QScatterSeries>
 #include <QtCharts/QValueAxis>
 #include <QMenuBar>
 
@@ -35,12 +36,15 @@ public:
 
     Q_INVOKABLE void getLineSeriesPerShare(int rowId,
                                            QLineSeries* lineSeriesEarnings,
+                                           QScatterSeries* scatterSeriesEarnings,
                                            QLineSeries* lineSeriesDividends,
+                                           QScatterSeries* scatterSeriesDividends,
                                            QValueAxis* xAxis,
                                            QValueAxis* yAxis);
 
     Q_INVOKABLE void getLineSeriesRevenue(int rowId,
                                           QLineSeries* lineSeriesRevenues,
+                                          QScatterSeries* scatterSeriesReveues,
                                           QValueAxis* yAxis);
 
     Q_INVOKABLE QString getTableName(int rowId);
@@ -61,12 +65,9 @@ private:
         Year,
         Rate,
         Percentage,
-        RevenueCorrelation,
         RevenueGrowth,
-        EarningCorrelation,
         EarningGrowth,
         DividendGrowth,
-        DividendStability,
         PayoutRatio,
         Remark
     };

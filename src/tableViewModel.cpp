@@ -13,7 +13,7 @@ struct orderByDividend
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.DividendGrowthThreeYears() < ent2.DividendGrowthThreeYears());
+        return (ent1.DividendGrowthFiveYears() < ent2.DividendGrowthFiveYears());
     }
 };
 
@@ -21,7 +21,7 @@ struct orderByDividendDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.DividendGrowthThreeYears() > ent2.DividendGrowthThreeYears());
+        return (ent1.DividendGrowthFiveYears() > ent2.DividendGrowthFiveYears());
     }
 };
 
@@ -91,23 +91,9 @@ struct orderByRankDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
+        if(std::abs(ent1.Percentage() - ent2.Percentage()) < 0.01)
+            return ent1.DividendGrowthFiveYears() > ent2.DividendGrowthFiveYears();
         return (ent1.Percentage() > ent2.Percentage());
-    }
-};
-
-struct orderByRevenueCorrelation
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.RevenueStability() < ent2.RevenueStability());
-    }
-};
-
-struct orderByRevenueCorrelationDescending
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.RevenueStability() > ent2.RevenueStability());
     }
 };
 
@@ -115,7 +101,7 @@ struct orderByRevenueGrowth
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.RevenueGrowthThreeYears() < ent2.RevenueGrowthThreeYears());
+        return (ent1.RevenueGrowthFiveYears() < ent2.RevenueGrowthFiveYears());
     }
 };
 
@@ -123,23 +109,7 @@ struct orderByRevenueGrowthDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.RevenueGrowthThreeYears() > ent2.RevenueGrowthThreeYears());
-    }
-};
-
-struct orderByEarningCorrelation
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.EarningStability() < ent2.EarningStability());
-    }
-};
-
-struct orderByEarningCorrelationDescending
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.EarningStability() > ent2.EarningStability());
+        return (ent1.RevenueGrowthFiveYears() > ent2.RevenueGrowthFiveYears());
     }
 };
 
@@ -147,7 +117,7 @@ struct orderByEarningGrowth
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.EarningGrowthThreeYears() < ent2.EarningGrowthThreeYears());
+        return (ent1.EarningGrowthFiveYears() < ent2.EarningGrowthFiveYears());
     }
 };
 
@@ -155,7 +125,7 @@ struct orderByEarningGrowthDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.EarningGrowthThreeYears() > ent2.EarningGrowthThreeYears());
+        return (ent1.EarningGrowthFiveYears() > ent2.EarningGrowthFiveYears());
     }
 };
 
@@ -163,7 +133,7 @@ struct orderByDividendGrowth
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.DividendGrowthThreeYears() < ent2.DividendGrowthThreeYears());
+        return (ent1.DividendGrowthFiveYears() < ent2.DividendGrowthFiveYears());
     }
 };
 
@@ -171,7 +141,7 @@ struct orderByDividendGrowthDescending
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
-        return (ent1.DividendGrowthThreeYears() > ent2.DividendGrowthThreeYears());
+        return (ent1.DividendGrowthFiveYears() > ent2.DividendGrowthFiveYears());
     }
 };
 
@@ -269,18 +239,12 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     }
     case Role::Percentage:
         return QString::number(_data[static_cast<size_t>(index.row())].Percentage(), 'f', 0);
-    case Role::RevenueCorrelation:
-        return QString::number(_data[static_cast<size_t>(index.row())].RevenueStability(), 'f', 0);
     case Role::RevenueGrowth:
-        return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthThreeYears(), 'f', 2);
-    case Role::EarningCorrelation:
-        return QString::number(_data[static_cast<size_t>(index.row())].EarningStability(), 'f', 0);
+        return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthFiveYears(), 'f', 2);
     case Role::EarningGrowth:
-        return QString::number(_data[static_cast<size_t>(index.row())].EarningGrowthThreeYears(), 'f', 1);
+        return QString::number(_data[static_cast<size_t>(index.row())].EarningGrowthFiveYears(), 'f', 1);
     case Role::DividendGrowth:
-        return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthThreeYears(), 'f', 1);
-    case Role::DividendStability:
-        return QString::number(_data[static_cast<size_t>(index.row())].DividendStability(), 'f', 0);
+        return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthFiveYears(), 'f', 1);
     case Role::PayoutRatio:
         return QString::number(_data[static_cast<size_t>(index.row())].PayoutRatio(), 'f', 0);
      case Role::Remark:
@@ -297,11 +261,8 @@ QHash<int, QByteArray> TableModel::roleNames() const
     roles[Role::Year] = "year";
     roles[Role::Rate] = "rate";
     roles[Role::Percentage] = "percentage";
-    roles[Role::RevenueCorrelation] = "revenueCorrelation";
     roles[Role::RevenueGrowth] = "revenueGrowth";
-    roles[Role::EarningCorrelation] = "earningCorrelation";
     roles[Role::EarningGrowth] = "earningGrowth";
-    roles[Role::DividendStability] = "dividendStability";
     roles[Role::DividendGrowth] = "dividendGrowth";
     roles[Role::PayoutRatio] = "payoutRatio";
     roles[Role::Remark] = "remark";
@@ -330,24 +291,18 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRank());
             break;
         case 4:
-            std::sort(_data.begin(), _data.end(), orderByRevenueCorrelation());
-            break;
-        case 5:
             std::sort(_data.begin(), _data.end(), orderByRevenueGrowth());
             break;
-        case 6:
-            std::sort(_data.begin(), _data.end(), orderByEarningCorrelation());
-            break;
-        case 7:
+        case 5:
             std::sort(_data.begin(), _data.end(), orderByEarningGrowth());
             break;
-        case 8:
+        case 6:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowth());
             break;
-        case 10:
+        case 7:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
             break;
-        case 11:
+        case 8:
             std::sort(_data.begin(), _data.end(), orderByRemark());
             break;
         default:
@@ -370,24 +325,18 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRankDescending());
             break;
         case 4:
-            std::sort(_data.begin(), _data.end(), orderByRevenueCorrelationDescending());
-            break;
-        case 5:
             std::sort(_data.begin(), _data.end(), orderByRevenueGrowthDescending());
             break;
-        case 6:
-            std::sort(_data.begin(), _data.end(), orderByEarningCorrelationDescending());
-            break;
-        case 7:
+        case 5:
             std::sort(_data.begin(), _data.end(), orderByEarningGrowthDescending());
             break;
-        case 8:
+        case 6:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowthDescending());
             break;
-        case 10:
+        case 7:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
             break;
-        case 11:
+        case 8:
             std::sort(_data.begin(), _data.end(), orderByRemarkDescending());
             break;
         default:
@@ -399,7 +348,9 @@ void TableModel::sort(int column, Qt::SortOrder order)
 
 void TableModel::getLineSeriesPerShare(int rowId,
                                        QLineSeries* lineSeriesEarnings,
+                                       QScatterSeries* scatterSeriesEarnings,
                                        QLineSeries* lineSeriesDividends,
+                                       QScatterSeries* scatterSeriesDividends,
                                        QValueAxis* xAxis,
                                        QValueAxis* yAxis)
 {
@@ -427,17 +378,30 @@ void TableModel::getLineSeriesPerShare(int rowId,
 
         if(std::min(yearDataSet.Dividend, yearDataSet.Earnings) < yMin)
         {
-            yMin = std::min(yearDataSet.Dividend, yearDataSet.Earnings);
+            yMin = std::min(yearDataSet.Dividend, yearDataSet.Earnings)*1.01;
         }
 
         if(std::max(yearDataSet.Dividend, yearDataSet.Earnings) > yMax)
         {
-            yMax = std::max(yearDataSet.Dividend, yearDataSet.Earnings);
+            yMax = std::max(yearDataSet.Dividend, yearDataSet.Earnings)*1.01;
         }
 
         // erzeuge die Graphen
-        lineSeriesEarnings->append(yearDataSet.Year, yearDataSet.Earnings);
-        lineSeriesDividends->append(yearDataSet.Year, yearDataSet.Dividend);
+        double m = _data.at(id).EarningRegression().m;
+        double n = _data.at(id).EarningRegression().n;
+
+        if (yearDataSet.Year >= _data.at(id).EarningRegression().startYear)
+            lineSeriesEarnings->append(yearDataSet.Year, m*yearDataSet.Year + n);
+        if (std::abs(yearDataSet.Earnings) > 0.1)
+            scatterSeriesEarnings->append(yearDataSet.Year, yearDataSet.Earnings);
+
+        m = _data.at(id).DividendRegresssion().m;
+        n = _data.at(id).DividendRegresssion().n;
+
+        if (yearDataSet.Year >= _data.at(id).DividendRegresssion().startYear)
+            lineSeriesDividends->append(yearDataSet.Year, yearDataSet.Year*m + n);
+        if (std::abs(yearDataSet.Dividend) > 0.1)
+            scatterSeriesDividends->append(yearDataSet.Year, yearDataSet.Dividend);
 
         // setze die x-y-Spanne auf die Achsen
         xAxis->setMin(xMin);
@@ -447,7 +411,10 @@ void TableModel::getLineSeriesPerShare(int rowId,
     }
 }
 
-void TableModel::getLineSeriesRevenue(int rowId, QLineSeries *lineSeriesRevenues, QValueAxis *yAxis)
+void TableModel::getLineSeriesRevenue(int rowId,
+                                      QLineSeries *lineSeriesRevenues,
+                                      QScatterSeries *scatterSerieRevenues,
+                                      QValueAxis *yAxis)
 {
     if(rowId == -1) return;
 
@@ -460,11 +427,17 @@ void TableModel::getLineSeriesRevenue(int rowId, QLineSeries *lineSeriesRevenues
     double yMin{1.0e9}, yMax{-1.0e9};
     for(const auto& yearDataSet : _data.at(id).GetYearData())
     {
-        yMin = std::min(yMin, yearDataSet.Revenue);
-        yMax = std::max(yMax, yearDataSet.Revenue);
+        yMin = std::min(yMin, yearDataSet.Revenue)*1.01;
+        yMax = std::max(yMax, yearDataSet.Revenue)*1.01;
 
-        // erzeuge die Graphen
-        lineSeriesRevenues->append(yearDataSet.Year, yearDataSet.Revenue);
+        double m = _data.at(id).RevenueRegression().m;
+        double n = _data.at(id).RevenueRegression().n;
+
+        if (yearDataSet.Year >= _data.at(id).RevenueRegression().startYear)
+            lineSeriesRevenues->append(yearDataSet.Year, m*yearDataSet.Year + n);
+
+        if (std::abs(yearDataSet.Revenue) > 0.1)
+            scatterSerieRevenues->append(yearDataSet.Year, yearDataSet.Revenue);
     }
 
     // setze die x-y-Spanne auf die Achsen

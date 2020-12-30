@@ -32,6 +32,12 @@ public:
         }
     };
 
+    struct RegressionParames{
+        double m;
+        double n;
+        int startYear;
+    };
+
     enum class Rate
     {
         A = 0,
@@ -73,17 +79,17 @@ public:
         _percentage = value;
     }
 
-    int RevenueStability() const
+    const RegressionParames& RevenueRegression() const
     {
-        return _revenueStability;
+        return _revenueRegression;
     }
 
-    void SetRevenueStability(int value)
+    void SetRevenueRegression(RegressionParames value)
     {
-        _revenueStability = value;
+        _revenueRegression = value;
     }
 
-    double RevenueGrowthThreeYears() const
+    double RevenueGrowthFiveYears() const
     {
         return _revenueGrowth;
     }
@@ -93,17 +99,17 @@ public:
         _revenueGrowth = value;
     }
 
-    int EarningStability() const
+    const RegressionParames& EarningRegression() const
     {
-        return _earningStability;
+        return _earningRegression;
     }
 
-    void SetEarningStability(int value)
+    void SetEarningRegression(RegressionParames value)
     {
-        _earningStability = value;
+        _earningRegression = value;
     }
 
-    double EarningGrowthThreeYears() const
+    double EarningGrowthFiveYears() const
     {
         return _earningGrowth;
     }
@@ -113,7 +119,7 @@ public:
         _earningGrowth = value;
     }
 
-    double DividendGrowthThreeYears() const
+    double DividendGrowthFiveYears() const
     {
         return _dividendGrowth;
     }
@@ -123,14 +129,14 @@ public:
         _dividendGrowth = value;
     }
 
-    int DividendStability() const
+    const RegressionParames& DividendRegresssion() const
     {
-        return _dividendStability;
+        return _dividendRegression;
     }
 
-    void SetDividendStability(int value)
+    void SetDividendRegression(RegressionParames value)
     {
-        _dividendStability = value;
+        _dividendRegression = value;
     }
 
     double PayoutRatio() const
@@ -171,11 +177,11 @@ public:
      Rate _rating = Rate::C;
 
      double _percentage{0.0};
-     int _revenueStability{0};
+     RegressionParames _revenueRegression{0.0, 0.0};
      double _revenueGrowth{0.0};
-     int _earningStability{0};
+     RegressionParames _earningRegression{0.0, 0.0};
      double _earningGrowth{0.0};
-     int _dividendStability{0};
+     RegressionParames _dividendRegression{0.0, 0.0};
      double _dividendGrowth{0.0};
      double _payoutRatio{0.0};
 };

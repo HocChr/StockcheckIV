@@ -33,6 +33,9 @@ ApplicationWindow {
     property LineSeries chartSeriesEarnings
     property LineSeries chartSeriesDividend
     property LineSeries chartSeriesRevenues
+    property ScatterSeries chartScatterEarnings
+    property ScatterSeries chartScatterDividend
+    property ScatterSeries chartScatterRevenues
 
     // --- Functions and Actions ------------------------------------------
 
@@ -73,57 +76,42 @@ ApplicationWindow {
                 anchors.fill: parent
                 width: aboutDialog.availableWidth
                 text:
-"Der Stockcheck ist ein Programm zur Analyse von Aktien. Auf Basis der Dividende pro Aktie und des
-Gewinn pro Aktie der mindestens letzten 8 Jahre wir eine Berechnung des Gewinnwachstums,
-der Gewinnstabilität, der Dividendenstabilität, des Dividendenwachstums und der Auschüttungsquote
-durchgeführt.
+"Der Stockcheck ist ein Programm zur Analyse von Aktien. Relevant und notwendig
+für die Bewertung einer Aktie sind der Umsatz, der Gewinn/Aktie und die Dividende/Aktie.
 
-Die Aktien werden in 2 Kategorien unterteilt. Zum einen in Dividendenaktien, zum anderen in
-Wachstumsaktien. Für beide Kategorien wird ein Punktzahl ermittelt und auf Basis der Punktzahl
-eine Rating A, B oder C.
+Für jede Größe (Umsatz, Gewinn/Aktie und Dividende/Aktie) wird die Compound Annual Growth
+Rate (CAGR) auf Basis der letzten 5 Jahre berechnet. Außerdem wird die kumulierte
+Ausschüttungsquote der letzen 5 Jahre berechnet.
 
-Eine Wachstumsaktie ist eine Aktie, die in ihrer Vergangenheit keine Dividende gezahlt hat und
-die mindestens eine Punktezahl von 50 in der Wachstums-Aktien-Bewertung erreicht.
-Eine Dividendenaktie ist eine Aktie, die keine Wachstumsaktie ist, die aber mindestens 50 Punkte
-nach der Dividenden-Aktien-Bewertung erreicht.
+Auf Basis dieser berechneten Größen werden jeweils bis zu 5 Punkte wie folgt vergeben,
+jeweils für den Umsatz, den Gewinn/Aktie und die Dividende/Aktie:
 
-Die Bewertung funktioniert wie folgt. Für jedes zu bewertende Kriterium wird zwischen einer
-unteren und einer oberen Grenze linear interpoliert. D.h. erreicht eine Aktie das Minimum eines
-Kriteriums nicht, erhält sie 0 Punkte. Erreicht die Aktie das Maximum eines Kriteriums, erhält
-sie 100 Punkte. Dazwischen wird interpoliert.
+CAGR >= 1% p.a.: +1 Punkt
+CAGR >= 2% p.a.: +1 Punkt
+CAGR >= 3% p.a.: +1 Punkt
+CAGR >= 4% p.a.: +1 Punkt
+CAGR >= 5% p.a.: +1 Punkt
+------------------------
 
-Schließlich wird der Mittelwert über die Anzahl der herangezogenen Kriterien ermittelt.
+Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:
 
-Die Kriterien für eine Wachstumsaktie sind
+5%  < AQ < 95%: +1 Punkt
+10% < AQ < 90%: +1 Punkt
+15% < AQ < 85%: +1 Punkt
+20% < AQ < 80%: +1 Punkt
+30% < AQ < 70%: +1 Punkt
+------------------------
 
-    1. Beträgt die Compound Annual Growth Rate (CAGD) des Gewinns pro Aktie über die letzten 3 Jahre
-       0% p.a oder weniger, erhält die Aktie 0 Punkte. Beträgt das CAGD 10% p.a. oder mehr, 100 Punkte.
-    2. Beträgt die Stabilität des Gewinns 0.5 oder weniger -> 0 Punkte, bei 1 -> 100 Punkte.
+Eine Aktie kann so bis zu 20 Punkte erhalten.
+Die Bewertung A, B oder C der Aktie wird wie folgt ermittelt:
 
-    3. Beträgt die Compound Annual Growth Rate (CAGD) des Umsatzes über die letzten 3 Jahre
-       0% p.a oder weniger, erhält die Aktie 0 Punkte. Beträgt das CAGD 10% p.a. oder mehr, 100 Punkte.
-    4. Beträgt die Stabilität des Umsatzes 0.5 oder weniger -> 0 Punkte, bei 1 -> 100 Punkte.
+14 <= Punkte: Bewertung A
+10 <= Punkte: Bewertung B
+sonst: Bewertung C
+-------------------------
 
-Die Kriterien für eine Dividendenaktie sind
-
-    1. Beträgt die CAGD des Gewinns pro Aktie über die letzten 3 Jahre 0% p.a oder weniger -> 0 Punkte.
-       Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
-    2. Beträgt die Stabilität des Gewinns 0.0 oder weniger -> 0 Punkte, beträgt sie 1 -> 100 Punkte.
-
-    3. Beträgt die CAGD des Umsatzes über die letzten 3 Jahre 0% p.a oder weniger -> 0 Punkte.
-       Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
-    4. Beträgt die Stabilität des Umsatzes 0.0 oder weniger -> 0 Punkte, beträgt sie 1 -> 100 Punkte.
-
-    5. Die Anzahl der Jahre ohne Dividendenkürzung ist mindestens 0 -> 0 Punkte. 10 Jahre oder mehr -> 100 Punkte.
-    6. Beträgt die CAGD des Dividende pro Aktie über die letzten 3 Jahre beträgt 0% p.a oder weniger -> 0 Punkte.
-       Beträgt das CAGD 5% p.a. oder mehr, 100 Punkte.
-
-    7. Die Auschüttungsquote wird zu 100% erreicht, wenn sie innerhalb [40%, 60%] liegt.
-       Darüber/darunter wird linear bis auf 100%/0% interpoliert.
-
-Erreicht eine Aktie mindestens 50 Punkte als als Wachstumsaktie oder Dividendenaktie, erhält sie
-das Rating B. Erhält sie mindestens 75 Punkte, erhält sie das Rating A. Ansonsten erhält sie das
-Rating C."
+Die Aktien werden anschließend nach den erreichten Punkten, und hernach nach
+dem Dividenden CAGR sortiert."
                 font.pixelSize: 12
             }
         }
@@ -143,15 +131,15 @@ Rating C."
                 item.text = databaseNames[i];
 
                 // unfortunately there is no possibility to create actions dynamically
-                if(i == 0)
+                if(i === 0)
                     item.action = action0
-                else if(i == 1)
+                else if(i === 1)
                     item.action = action1
-                else if(i == 2)
+                else if(i === 2)
                     item.action = action2
-                else if(i == 3)
+                else if(i === 3)
                     item.action = action3
-                else if(i == 4)
+                else if(i === 4)
                     item.action = action4
                 item.action.text = databaseNames[i]
 
@@ -166,22 +154,36 @@ Rating C."
         chartViewBig.removeAllSeries();
 
         chartSeriesEarnings = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Gewinn/Aktie", xAxis, yAxis);
+        chartScatterEarnings = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, yAxis);
+
         chartSeriesDividend = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Dividende/Aktie", xAxis, yAxis);
+        chartScatterDividend = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, yAxis);
+
         chartSeriesRevenues = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Umsatz", xAxis, axisY2);
+        chartScatterRevenues = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, axisY2);
 
         tableModel.getLineSeriesPerShare(tablename,
                                          chartSeriesEarnings,
+                                         chartScatterEarnings,
                                          chartSeriesDividend,
+                                         chartScatterDividend,
                                          xAxis,
                                          yAxis);
 
         tableModel.getLineSeriesRevenue(tablename,
                                         chartSeriesRevenues,
+                                        chartScatterRevenues,
                                         axisY2);
 
         chartSeriesDividend.color = "blue"
+        chartScatterDividend.color = "blue"
+        chartScatterDividend.markerSize = 8;
         chartSeriesEarnings.color = "green"
+        chartScatterEarnings.color = "green"
+        chartScatterEarnings.markerSize = 8
         chartSeriesRevenues.color = "grey"
+        chartScatterRevenues.color = "grey"
+        chartScatterRevenues.markerSize = 8
 
         chartSeriesDividend.width = 5
         chartSeriesEarnings.width = 5
@@ -267,56 +269,38 @@ Rating C."
             }
             TableViewColumn {
                 role: "percentage"
-                title: "Punkte von 20"
-                width: 90
-                movable: false
-            }
-            TableViewColumn {
-                role: "revenueCorrelation"
-                title: "Umsatzstabilität"
-                width: 120
+                title: "Punkte"
+                width: 60
                 movable: false
             }
             TableViewColumn {
                 role: "revenueGrowth"
-                title: "Umsatzwachstum"
-                width: 120
-                movable: false
-            }
-            TableViewColumn {
-                role: "earningCorrelation"
-                title: "Gewinnstabilität"
-                width: 120
+                title: "Umsatz CAGR"
+                width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "earningGrowth"
-                title: "Gewinnwachstum"
-                width: 120
+                title: "Gewinn CAGR"
+                width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "dividendGrowth"
-                title: "Dividendenwachstum"
-                width: 120
-                movable: false
-            }
-            TableViewColumn {
-                role: "dividendStability"
-                title: "Dividendenstabilität"
-                width: 120
+                title: "Dividenden CAGR"
+                width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "payoutRatio"
                 title: "Auschüttungsquote"
-                width: 120
+                width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "remark"
                 title: "Bemerkung"
-                width: 250
+                width: 350
                 movable: false
             }
 

@@ -15,6 +15,11 @@ public:
     {
         for (auto& stock : stocks)
         {
+            // Order Data before doing anything
+            std::vector<StockEntity::YearDataSet> data = stock.GetYearData();
+            std::sort(data.begin(), data.end());
+            stock.SetYearData(data);
+
             if (!Calculate(stock))
             {
                 stock.AddRemark("Keine Auswertung");
@@ -29,7 +34,7 @@ public:
 private:
 
     double _minHold = 10;
-    double _minBuy = 16;
+    double _minBuy = 14;
 
 	void doRating(StockEntity& stock)
 	{
@@ -46,27 +51,45 @@ private:
 		stock.SetRating(StockEntity::Rate::C);
     }
 
+    int GetScoreOfGrowth(double growth)
+    {
+        int score = 0;
+
+        if(growth > 1.0)
+            score++;
+        if(growth > 2.0)
+            score++;
+        if(growth > 3.0)
+            score++;
+        if(growth > 4.0)
+            score++;
+        if(growth > 5.0)
+            score++;
+
+        return score;
+    }
+
     void EvaluateStock(StockEntity& stock)
     {
-        int score = stock.RevenueStability();
-        if (score <= 3)
-            stock.AddRemark("Umsatzstabilität gering");
+        int score = 0;
+        double growth = stock.RevenueGrowthFiveYears();
+        if (growth <= 1.5)
+            stock.AddRemark("Umsatzwachstum gering");
+        score += GetScoreOfGrowth(growth);
 
-        int scoreTmp = stock.EarningStability();
-        if (scoreTmp <= 3)
-            stock.AddRemark("Gewinnstabilität gering");
-        score += scoreTmp;
+        growth = stock.EarningGrowthFiveYears();
+        if (growth <= 1.5)
+            stock.AddRemark("Gewinnwachstum gering");
+        score += GetScoreOfGrowth(growth);
 
-        stock.SetDividendStability(stock.DividendStability() - GetNumYearsDividendReduced(stock));
-        scoreTmp = stock.DividendStability();
-        if (scoreTmp <= 3)
-            stock.AddRemark("Dividendentabilität gering");
-        score += scoreTmp;
+        growth = stock.DividendGrowthFiveYears();
+        if (growth <= 1.5)
+            stock.AddRemark("Dividendenwachstum gering");
+        score += GetScoreOfGrowth(growth);
 
-        scoreTmp = getPointsOfPayoutRatio(stock);
-        if (scoreTmp <= 3)
+        if (getPointsOfPayoutRatio(stock) <= 3)
             stock.AddRemark("Auschüttungsquote nicht gut");
-        score += scoreTmp;
+        score += getPointsOfPayoutRatio(stock);
 
         stock.SetPercentag(score);
     }
@@ -75,15 +98,17 @@ private:
 
     bool Calculate(StockEntity& stock)
 	{        
-        if (stock.GetYearData().size() < numYears)
+        if (stock.GetYearData().size() < numYears + 1)
         {
             return false;
         }
-        if (!SetEarningStability(stock)) return false;
-        if (!SetRevenueStability(stock)) return false;
-        if (!SetDividendStability(stock)) return false;
+
         if (!SetGrowths(stock)) return false;
 		if (!SetPayoutRatio(stock)) return false;
+
+        SetDividendRegression(stock);
+        SetEarningRegression(stock);
+        SetRevenueRegression(stock);
 
 		return true;
 	}
@@ -120,55 +145,67 @@ private:
         // calculate three years earnings growth
         auto x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Earnings;
         auto x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
-        stock.SetEarningGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
+        stock.SetEarningGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         // calculate three years dividend growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Dividend;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
-        stock.SetDividendGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
+        stock.SetDividendGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         // calculate three years revenue growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Revenue;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
-        stock.SetRevenueGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 3));
+        stock.SetRevenueGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         return true;
     }
 
-    bool SetEarningStability(StockEntity& stock)
-    {
-        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Earnings; };
-        int stability = 0;
-        if(GetCorrelationFactor(stock, lambda, stability))
-        {
-            stock.SetEarningStability(stability);
-            return true;
-        }
-        return false;
-    }
-
-    bool SetRevenueStability(StockEntity& stock)
-    {
-        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Revenue; };
-        int stability = 0;
-        if(GetCorrelationFactor(stock, lambda, stability))
-        {
-            stock.SetRevenueStability(stability);
-            return true;
-        }
-        return false;
-    }
-
-    bool SetDividendStability(StockEntity& stock)
+    bool SetDividendRegression(StockEntity& stock)
     {
         auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Dividend; };
-        int stability = 0;
-        if(GetCorrelationFactor(stock, lambda, stability))
-        {
-            stock.SetDividendStability(stability);
-            return true;
-        }
-        return false;
+        double n = 0.0;
+        double m = 0.0;
+        GetRegressionParameters(stock, lambda, n, m);
+
+        StockEntity::RegressionParames dividendRegParams;
+        dividendRegParams.m = m;
+        dividendRegParams.n = n;
+        dividendRegParams.startYear = stock.GetYearData().back().Year - numYears;
+        stock.SetDividendRegression(dividendRegParams);
+
+        return true;
+    }
+
+    bool SetEarningRegression(StockEntity& stock)
+    {
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Earnings; };
+        double n = 0.0;
+        double m = 0.0;
+        GetRegressionParameters(stock, lambda, n, m);
+
+        StockEntity::RegressionParames earningRegParams;
+        earningRegParams.m = m;
+        earningRegParams.n = n;
+        earningRegParams.startYear = stock.GetYearData().back().Year - numYears;
+        stock.SetEarningRegression(earningRegParams);
+
+        return true;
+    }
+
+    bool SetRevenueRegression(StockEntity& stock)
+    {
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Revenue; };
+        double n = 0.0;
+        double m = 0.0;
+        GetRegressionParameters(stock, lambda, n, m);
+
+        StockEntity::RegressionParames revenueRegParams;
+        revenueRegParams.m = m;
+        revenueRegParams.n = n;
+        revenueRegParams.startYear = stock.GetYearData().back().Year - numYears;
+        stock.SetRevenueRegression(revenueRegParams);
+
+        return true;
     }
 
     template<typename Functor>
@@ -189,6 +226,23 @@ private:
 
         outValue = counter;
         return true;
+    }
+
+    template<typename Functor>
+    void GetRegressionParameters(const StockEntity& stock,
+                                 Functor functor,
+                                 double& n,
+                                 double& m)
+    {
+        const std::vector<StockEntity::YearDataSet>& yearDataSet = stock.GetYearData();
+
+        auto lambda = [] (const StockEntity::YearDataSet& entitiy) { return entitiy.Year; };
+
+        double yearAverage = calcAverageOverNumYears(yearDataSet, lambda);
+        double yAverage = calcAverageOverNumYears(yearDataSet, functor);
+
+        m = calcParameterBOverNumYears(yearDataSet, yearAverage, yAverage, functor);
+        n = yAverage - m*yearAverage;
     }
 
     // compound annual growth rate : CAGR = (EB / BB)^(1 / N) - 1
@@ -244,6 +298,34 @@ int getPointsOfPayoutRatio(const StockEntity& stock)
         point++;
 
     return point;
+}
+
+template<typename Functor>
+double calcAverageOverNumYears(const std::vector<StockEntity::YearDataSet>& data, Functor functor)
+{
+    double average = 0.0;
+    for(unsigned i = data.size() - (numYears + 1); i < data.size(); ++i)
+    {
+        average += functor(data[i]);
+    }
+    average /= (numYears + 1);
+    return average;
+}
+
+template<typename Functor>
+double calcParameterBOverNumYears(const std::vector<StockEntity::YearDataSet>& data,
+                                  double xRoof,
+                                  double yRoof,
+                                  Functor functor)
+{
+    double counter = 0.0;
+    double denominator = 0.0;
+    for(unsigned i = data.size() - (numYears + 1); i < data.size(); ++i)
+    {
+        counter += (data[i].Year - xRoof) * (functor(data[i]) - yRoof);
+        denominator += (data[i].Year - xRoof) * (data[i].Year - xRoof);
+    }
+    return counter / denominator;
 }
 
 void CalculateAndEvaluate(std::vector<StockEntity>& stocks)
