@@ -33,9 +33,9 @@ ApplicationWindow {
     property LineSeries chartSeriesEarnings
     property LineSeries chartSeriesDividend
     property LineSeries chartSeriesRevenues
-    property ScatterSeries chartScatterEarnings
-    property ScatterSeries chartScatterDividend
-    property ScatterSeries chartScatterRevenues
+    property LineSeries chartScatterEarnings
+    property LineSeries chartScatterDividend
+    property LineSeries chartScatterRevenues
 
     // --- Functions and Actions ------------------------------------------
 
@@ -154,13 +154,13 @@ dem Dividenden CAGR sortiert."
         chartViewBig.removeAllSeries();
 
         chartSeriesEarnings = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Gewinn/Aktie", xAxis, yAxis);
-        chartScatterEarnings = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, yAxis);
+        chartScatterEarnings = chartViewBig.createSeries(ChartView.SeriesTypeLine, "", xAxis, yAxis);
 
         chartSeriesDividend = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Dividende/Aktie", xAxis, yAxis);
-        chartScatterDividend = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, yAxis);
+        chartScatterDividend = chartViewBig.createSeries(ChartView.SeriesTypeLine, "", xAxis, yAxis);
 
         chartSeriesRevenues = chartViewBig.createSeries(ChartView.SeriesTypeLine, "Umsatz", xAxis, axisY2);
-        chartScatterRevenues = chartViewBig.createSeries(ChartView.SeriesTypeScatter, "", xAxis, axisY2);
+        chartScatterRevenues = chartViewBig.createSeries(ChartView.SeriesTypeLine, "", xAxis, axisY2);
 
         tableModel.getLineSeriesPerShare(tablename,
                                          chartSeriesEarnings,

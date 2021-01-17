@@ -348,9 +348,9 @@ void TableModel::sort(int column, Qt::SortOrder order)
 
 void TableModel::getLineSeriesPerShare(int rowId,
                                        QLineSeries* lineSeriesEarnings,
-                                       QScatterSeries* scatterSeriesEarnings,
+                                       QLineSeries* scatterSeriesEarnings,
                                        QLineSeries* lineSeriesDividends,
-                                       QScatterSeries* scatterSeriesDividends,
+                                       QLineSeries* scatterSeriesDividends,
                                        QValueAxis* xAxis,
                                        QValueAxis* yAxis)
 {
@@ -413,7 +413,7 @@ void TableModel::getLineSeriesPerShare(int rowId,
 
 void TableModel::getLineSeriesRevenue(int rowId,
                                       QLineSeries *lineSeriesRevenues,
-                                      QScatterSeries *scatterSerieRevenues,
+                                      QLineSeries *scatterSerieRevenues,
                                       QValueAxis *yAxis)
 {
     if(rowId == -1) return;
