@@ -86,11 +86,11 @@ Ausschüttungsquote der letzen 5 Jahre berechnet.
 Auf Basis dieser berechneten Größen werden jeweils bis zu 5 Punkte wie folgt vergeben,
 jeweils für den Umsatz, den Gewinn/Aktie und die Dividende/Aktie:
 
-CAGR >= 1% p.a.: +1 Punkt
-CAGR >= 2% p.a.: +1 Punkt
-CAGR >= 3% p.a.: +1 Punkt
-CAGR >= 4% p.a.: +1 Punkt
-CAGR >= 5% p.a.: +1 Punkt
+CAGR > 0.00% p.a.: +1 Punkt
+CAGR > 1.25% p.a.: +1 Punkt
+CAGR > 2.50% p.a.: +1 Punkt
+CAGR > 3.75% p.a.: +1 Punkt
+CAGR > 5.00% p.a.: +1 Punkt
 ------------------------
 
 Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:

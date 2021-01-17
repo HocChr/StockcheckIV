@@ -55,13 +55,13 @@ private:
     {
         int score = 0;
 
-        if(growth > 1.0)
+        if(growth > 0.0)
             score++;
-        if(growth > 2.0)
+        if(growth > 1.25)
             score++;
-        if(growth > 3.0)
+        if(growth > 2.5)
             score++;
-        if(growth > 4.0)
+        if(growth > 3.75)
             score++;
         if(growth > 5.0)
             score++;
