@@ -33,7 +33,7 @@ public:
 
 private:
 
-    double _minHold = 10;
+    double _minHold = 5;
     double _minBuy = 14;
 
 	void doRating(StockEntity& stock)

@@ -106,7 +106,7 @@ Eine Aktie kann so bis zu 20 Punkte erhalten.
 Die Bewertung A, B oder C der Aktie wird wie folgt ermittelt:
 
 14 <= Punkte: Bewertung A
-10 <= Punkte: Bewertung B
+04 <= Punkte: Bewertung B
 sonst: Bewertung C
 -------------------------
 
