@@ -34,7 +34,7 @@ public:
 private:
 
     double _minHold = 5;
-    double _minBuy = 14;
+    double _minBuy = 20;
 
 	void doRating(StockEntity& stock)
 	{
@@ -85,7 +85,7 @@ private:
         growth = stock.DividendGrowthFiveYears();
         if (growth <= 1.5)
             stock.AddRemark("Dividendenwachstum gering");
-        score += GetScoreOfGrowth(growth);
+        score += 2*GetScoreOfGrowth(growth);
 
         if (getPointsOfPayoutRatio(stock) <= 3)
             stock.AddRemark("Auschüttungsquote nicht gut");
@@ -145,17 +145,17 @@ private:
         // calculate three years earnings growth
         auto x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Earnings;
         auto x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
-        stock.SetEarningGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
+        stock.SetEarningGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         // calculate three years dividend growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Dividend;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
-        stock.SetDividendGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
+        stock.SetDividendGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         // calculate three years revenue growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Revenue;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
-        stock.SetRevenueGrowthThreeYears(CompoundAnnualGrowthRate(x1, x0, 5));
+        stock.SetRevenueGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
         return true;
     }
