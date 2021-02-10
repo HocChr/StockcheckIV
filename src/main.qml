@@ -93,6 +93,9 @@ CAGR > 3.75% p.a.: +1 Punkt
 CAGR > 5.00% p.a.: +1 Punkt
 ------------------------
 
+Dividenden werden stärker berücksichtigt, daher werden die erreichten Punkte aufgrund des
+Dividenden-CAGR mit dem Faktor 2 multipliziert.
+
 Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:
 
 5%  < AQ < 95%: +1 Punkt
@@ -105,8 +108,8 @@ Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:
 Eine Aktie kann so bis zu 20 Punkte erhalten.
 Die Bewertung A, B oder C der Aktie wird wie folgt ermittelt:
 
-14 <= Punkte: Bewertung A
-04 <= Punkte: Bewertung B
+20 <= Punkte: Bewertung A
+05 <= Punkte: Bewertung B
 sonst: Bewertung C
 -------------------------
 
