@@ -86,11 +86,11 @@ Ausschüttungsquote der letzen 5 Jahre berechnet.
 Auf Basis dieser berechneten Größen werden jeweils bis zu 5 Punkte wie folgt vergeben,
 jeweils für den Umsatz, den Gewinn/Aktie und die Dividende/Aktie:
 
-CAGR > 0.00% p.a.: +1 Punkt
-CAGR > 1.25% p.a.: +1 Punkt
-CAGR > 2.50% p.a.: +1 Punkt
-CAGR > 3.75% p.a.: +1 Punkt
-CAGR > 5.00% p.a.: +1 Punkt
+CAGR > 1.0% p.a.: +1 Punkt
+CAGR > 2.0% p.a.: +1 Punkt
+CAGR > 3.0% p.a.: +1 Punkt
+CAGR > 4.0% p.a.: +1 Punkt
+CAGR > 5.0% p.a.: +1 Punkt
 ------------------------
 
 Dividenden werden stärker berücksichtigt, daher werden die erreichten Punkte aufgrund des
@@ -108,8 +108,8 @@ Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:
 Eine Aktie kann so bis zu 20 Punkte erhalten.
 Die Bewertung A, B oder C der Aktie wird wie folgt ermittelt:
 
-20 <= Punkte: Bewertung A
-05 <= Punkte: Bewertung B
+35 <= Punkte: Bewertung A
+15 <= Punkte: Bewertung B
 sonst: Bewertung C
 -------------------------
 
@@ -283,19 +283,13 @@ dem Dividenden CAGR sortiert."
                 movable: false
             }
             TableViewColumn {
-                role: "revenueGrowth1Year"
-                title: "Umsatz CAGR 1J."
-                width: 100
-                movable: false
-            }
-            TableViewColumn {
-                role: "earningGrowth"
+                role: "earningGrowth5Years"
                 title: "Gewinn CAGR 5J."
                 width: 100
                 movable: false
             }
             TableViewColumn {
-                role: "dividendGrowth"
+                role: "dividendGrowth5Years"
                 title: "Dividenden CAGR 5J."
                 width: 120
                 movable: false
@@ -303,6 +297,24 @@ dem Dividenden CAGR sortiert."
             TableViewColumn {
                 role: "payoutRatio"
                 title: "Auschüttungsquote"
+                width: 100
+                movable: false
+            }
+            TableViewColumn {
+                role: "revenueGrowth1Year"
+                title: "Umsatz CAGR 1J."
+                width: 100
+                movable: false
+            }
+            TableViewColumn {
+                role: "earningGrowth1Year"
+                title: "Gewinn CAGR 1J."
+                width: 100
+                movable: false
+            }
+            TableViewColumn {
+                role: "dividendGrowth1Year"
+                title: "Dividende CAGR 1J."
                 width: 100
                 movable: false
             }

@@ -65,10 +65,12 @@ private:
         Rate,
         Percentage,
         RevenueGrowth5Years,
-        RevenueGrowth1Year,
         EarningGrowth,
         DividendGrowth,
         PayoutRatio,
+        RevenueGrowth1Year,
+        EarningGrowth1Year,
+        DividendGrowth1Year,
         Remark
     };
 

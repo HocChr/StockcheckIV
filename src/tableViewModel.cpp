@@ -113,22 +113,6 @@ struct orderByRevenueGrowth5YearsDescending
     }
 };
 
-struct orderByRevenueGrowth1Years
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.RevenueGrowthOneYear() < ent2.RevenueGrowthOneYear());
-    }
-};
-
-struct orderByRevenueGrowth1YearsDescending
-{
-    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
-    {
-        return (ent1.RevenueGrowthOneYear() > ent2.RevenueGrowthOneYear());
-    }
-};
-
 struct orderByEarningGrowth
 {
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
@@ -174,6 +158,54 @@ struct orderByPayoutRatioDescending
     inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
     {
         return (ent1.PayoutRatio() > ent2.PayoutRatio());
+    }
+};
+
+struct orderByRevenueGrowth1Years
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.RevenueGrowthOneYear() < ent2.RevenueGrowthOneYear());
+    }
+};
+
+struct orderByRevenueGrowth1YearsDescending
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.RevenueGrowthOneYear() > ent2.RevenueGrowthOneYear());
+    }
+};
+
+struct orderByEarningGrowth1Years
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.EarningGrowthOneYear() < ent2.EarningGrowthOneYear());
+    }
+};
+
+struct orderByEarningGrowth1YearsDescending
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.EarningGrowthOneYear() > ent2.EarningGrowthOneYear());
+    }
+};
+
+struct orderByDividendGrowth1Years
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.DividendGrowthOneYear() < ent2.DividendGrowthOneYear());
+    }
+};
+
+struct orderByDividendGrowth1YearsDescending
+{
+    inline bool operator() (const StockEntity& ent1, const StockEntity& ent2)
+    {
+        return (ent1.DividendGrowthOneYear() > ent2.DividendGrowthOneYear());
     }
 };
 
@@ -225,7 +257,7 @@ int TableModel::rowCount(const QModelIndex &) const
 
 int TableModel::columnCount(const QModelIndex &) const
 {
-    return 12;
+    return 15;
 }
 
 QVariant TableModel::data(const QModelIndex &index, int role) const
@@ -257,14 +289,18 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
         return QString::number(_data[static_cast<size_t>(index.row())].Percentage(), 'f', 0);
     case Role::RevenueGrowth5Years:
         return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthFiveYears(), 'f', 2);
-    case Role::RevenueGrowth1Year:
-        return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthOneYear(), 'f', 2);
     case Role::EarningGrowth:
         return QString::number(_data[static_cast<size_t>(index.row())].EarningGrowthFiveYears(), 'f', 1);
     case Role::DividendGrowth:
         return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthFiveYears(), 'f', 1);
     case Role::PayoutRatio:
         return QString::number(_data[static_cast<size_t>(index.row())].PayoutRatio(), 'f', 0);
+    case Role::RevenueGrowth1Year:
+        return QString::number(_data[static_cast<size_t>(index.row())].RevenueGrowthOneYear(), 'f', 2);
+    case Role::EarningGrowth1Year:
+        return QString::number(_data[static_cast<size_t>(index.row())].EarningGrowthOneYear(), 'f', 2);
+    case Role::DividendGrowth1Year:
+        return QString::number(_data[static_cast<size_t>(index.row())].DividendGrowthOneYear(), 'f', 2);
      case Role::Remark:
         return QString::fromStdString(_data[static_cast<size_t>(index.row())].GetRemarks());
     default:
@@ -280,10 +316,12 @@ QHash<int, QByteArray> TableModel::roleNames() const
     roles[Role::Rate] = "rate";
     roles[Role::Percentage] = "percentage";
     roles[Role::RevenueGrowth5Years] = "revenueGrowth5Years";
-    roles[Role::RevenueGrowth1Year] = "revenueGrowth1Year";
-    roles[Role::EarningGrowth] = "earningGrowth";
-    roles[Role::DividendGrowth] = "dividendGrowth";
+    roles[Role::EarningGrowth] = "earningGrowth5Years";
+    roles[Role::DividendGrowth] = "dividendGrowth5Years";
     roles[Role::PayoutRatio] = "payoutRatio";
+    roles[Role::RevenueGrowth1Year] = "revenueGrowth1Year";
+    roles[Role::EarningGrowth1Year] = "earningGrowth1Year";
+    roles[Role::DividendGrowth1Year] = "dividendGrowth1Year";
     roles[Role::Remark] = "remark";
     return roles;
 }
@@ -310,18 +348,24 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRevenueGrowth5Years());
             break;
         case 5:
-            std::sort(_data.begin(), _data.end(), orderByRevenueGrowth1Years());
-            break;
-        case 6:
             std::sort(_data.begin(), _data.end(), orderByEarningGrowth());
             break;
-        case 7:
+        case 6:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowth());
             break;
-        case 8:
+        case 7:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatio());
             break;
+        case 8:
+            std::sort(_data.begin(), _data.end(), orderByRevenueGrowth1Years());
+            break;
         case 9:
+            std::sort(_data.begin(), _data.end(), orderByEarningGrowth1Years());
+            break;
+        case 10:
+            std::sort(_data.begin(), _data.end(), orderByDividendGrowth1Years());
+            break;
+        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemark());
             break;
         default:
@@ -347,18 +391,24 @@ void TableModel::sort(int column, Qt::SortOrder order)
             std::sort(_data.begin(), _data.end(), orderByRevenueGrowth5YearsDescending());
             break;
         case 5:
-            std::sort(_data.begin(), _data.end(), orderByRevenueGrowth1YearsDescending());
-            break;
-        case 6:
             std::sort(_data.begin(), _data.end(), orderByEarningGrowthDescending());
             break;
-        case 7:
+        case 6:
             std::sort(_data.begin(), _data.end(), orderByDividendGrowthDescending());
             break;
-        case 8:
+        case 7:
             std::sort(_data.begin(), _data.end(), orderByPayoutRatioDescending());
             break;
+        case 8:
+            std::sort(_data.begin(), _data.end(), orderByRevenueGrowth1YearsDescending());
+            break;
         case 9:
+            std::sort(_data.begin(), _data.end(), orderByEarningGrowth1YearsDescending());
+            break;
+        case 10:
+            std::sort(_data.begin(), _data.end(), orderByDividendGrowth1YearsDescending());
+            break;
+        case 11:
             std::sort(_data.begin(), _data.end(), orderByRemarkDescending());
             break;
         default:
