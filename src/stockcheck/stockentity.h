@@ -99,6 +99,16 @@ public:
         _revenueGrowthFiveYears = value;
     }
 
+    double RevenueGrowthOneYear() const
+    {
+        return _revenueGrowthOneYear;
+    }
+
+    void SetRevenueGrowthOneYear(double value)
+    {
+        _revenueGrowthOneYear = value;
+    }
+
     const RegressionParames& EarningRegression() const
     {
         return _earningRegression;
@@ -119,6 +129,16 @@ public:
         _earningGrowthFiveYears = value;
     }
 
+    double EarningGrowthOneYear() const
+    {
+        return _earningGrowthOneYear;
+    }
+
+    void SetEarningGrowthOneYear(double value)
+    {
+        _earningGrowthOneYear = value;
+    }
+
     double DividendGrowthFiveYears() const
     {
         return _dividendGrowthFiveYears;
@@ -127,6 +147,16 @@ public:
     void SetDividendGrowthFiveYears(double value)
     {
         _dividendGrowthFiveYears = value;
+    }
+
+    double DividendGrowthOneYear() const
+    {
+        return _dividendGrowthOneYear;
+    }
+
+    void SetDividendGrowthOneYear(double value)
+    {
+        _dividendGrowthOneYear = value;
     }
 
     const RegressionParames& DividendRegresssion() const
@@ -179,10 +209,13 @@ public:
      double _percentage{0.0};
      RegressionParames _revenueRegression{0.0, 0.0};
      double _revenueGrowthFiveYears{0.0};
+     double _revenueGrowthOneYear{0.0};
      RegressionParames _earningRegression{0.0, 0.0};
      double _earningGrowthFiveYears{0.0};
+     double _earningGrowthOneYear{0.0};
      RegressionParames _dividendRegression{0.0, 0.0};
      double _dividendGrowthFiveYears{0.0};
+     double _dividendGrowthOneYear{0.0};
      double _payoutRatio{0.0};
 };
 

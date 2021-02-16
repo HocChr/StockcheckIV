@@ -33,8 +33,8 @@ public:
 
 private:
 
-    double _minHold = 5;
-    double _minBuy = 20;
+    double _minHold = 15;
+    double _minBuy = 35;
 
 	void doRating(StockEntity& stock)
 	{
@@ -55,13 +55,13 @@ private:
     {
         int score = 0;
 
-        if(growth > 0.0)
+        if(growth > 1.0)
             score++;
-        if(growth > 1.25)
+        if(growth > 2.0)
             score++;
-        if(growth > 2.5)
+        if(growth > 3.0)
             score++;
-        if(growth > 3.75)
+        if(growth > 4.0)
             score++;
         if(growth > 5.0)
             score++;
@@ -74,22 +74,37 @@ private:
         int score = 0;
         double growth = stock.RevenueGrowthFiveYears();
         if (growth <= 1.5)
-            stock.AddRemark("Umsatzwachstum gering");
+            stock.AddRemark("Umsatzwachstum gering (5J.)");
+        score += GetScoreOfGrowth(growth);
+
+        growth = stock.RevenueGrowthOneYear();
+        if (growth <= 1.5)
+            stock.AddRemark("Umsatzwachstum gering (1J.)");
         score += GetScoreOfGrowth(growth);
 
         growth = stock.EarningGrowthFiveYears();
         if (growth <= 1.5)
-            stock.AddRemark("Gewinnwachstum gering");
+            stock.AddRemark("Gewinnwachstum gering (5J.)");
+        score += GetScoreOfGrowth(growth);
+
+        growth = stock.EarningGrowthOneYear();
+        if (growth <= 1.5)
+            stock.AddRemark("Gewinnwachstum gering (1J.)");
         score += GetScoreOfGrowth(growth);
 
         growth = stock.DividendGrowthFiveYears();
         if (growth <= 1.5)
-            stock.AddRemark("Dividendenwachstum gering");
+            stock.AddRemark("Dividendenwachstum gering (5J.)");
+        score += 2*GetScoreOfGrowth(growth);
+
+        growth = stock.DividendGrowthOneYear();
+        if (growth <= 1.5)
+            stock.AddRemark("Dividendenwachstum gering (1J.)");
         score += 2*GetScoreOfGrowth(growth);
 
         if (getPointsOfPayoutRatio(stock) <= 3)
             stock.AddRemark("Auschüttungsquote nicht gut");
-        score += getPointsOfPayoutRatio(stock);
+        score += 2*getPointsOfPayoutRatio(stock);
 
         stock.SetPercentag(score);
     }
@@ -142,20 +157,35 @@ private:
     {
         if (stock.GetYearData().size() < 6) return false;
 
-        // calculate three years earnings growth
+        // calculate five years earnings growth
         auto x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Earnings;
         auto x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
         stock.SetEarningGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
-        // calculate three years dividend growth
+        // calculate one year earnings growth
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 2].Earnings;
+        x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Earnings;
+        stock.SetEarningGrowthOneYear(CompoundAnnualGrowthRate(x1, x0, 1));
+
+        // calculate five years dividend growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Dividend;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
         stock.SetDividendGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
 
-        // calculate three years revenue growth
+        // calculate one year dividend growth
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 2].Dividend;
+        x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Dividend;
+        stock.SetDividendGrowthOneYear(CompoundAnnualGrowthRate(x1, x0, 1));
+
+        // calculate five years revenue growth
         x0 = stock.GetYearData()[stock.GetYearData().size() - 6].Revenue;
         x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
         stock.SetRevenueGrowthFiveYears(CompoundAnnualGrowthRate(x1, x0, 5));
+
+        // calculate one year revenue growth
+        x0 = stock.GetYearData()[stock.GetYearData().size() - 2].Revenue;
+        x1 = stock.GetYearData()[stock.GetYearData().size() - 1].Revenue;
+        stock.SetRevenueGrowthOneYear(CompoundAnnualGrowthRate(x1, x0, 1));
 
         return true;
     }

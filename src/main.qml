@@ -277,21 +277,27 @@ dem Dividenden CAGR sortiert."
                 movable: false
             }
             TableViewColumn {
-                role: "revenueGrowth"
-                title: "Umsatz CAGR"
+                role: "revenueGrowth5Years"
+                title: "Umsatz CAGR 5J."
+                width: 100
+                movable: false
+            }
+            TableViewColumn {
+                role: "revenueGrowth1Year"
+                title: "Umsatz CAGR 1J."
                 width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "earningGrowth"
-                title: "Gewinn CAGR"
+                title: "Gewinn CAGR 5J."
                 width: 100
                 movable: false
             }
             TableViewColumn {
                 role: "dividendGrowth"
-                title: "Dividenden CAGR"
-                width: 100
+                title: "Dividenden CAGR 5J."
+                width: 120
                 movable: false
             }
             TableViewColumn {
