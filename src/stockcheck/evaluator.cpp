@@ -33,8 +33,8 @@ public:
 
 private:
 
-    double _minHold = 20;
-    double _minBuy = 35;
+    double _minHold = 5;
+    double _minBuy = 8;
 
 	void doRating(StockEntity& stock)
 	{
@@ -73,38 +73,38 @@ private:
     {
         int score = 0;
         double growth = stock.RevenueGrowthFiveYears();
-        if (growth <= 1.5)
+        if (growth < 0.0)
             stock.AddRemark("Umsatzwachstum gering (5J.)");
-        score += GetScoreOfGrowth(growth);
+        score += growth > 0 ? 1 : 0; // GetScoreOfGrowth(growth);
 
         growth = stock.RevenueGrowthOneYear();
-        if (growth <= 1.5)
+        if (growth < 0.0)
             stock.AddRemark("Umsatzwachstum gering (1J.)");
-        score += GetScoreOfGrowth(growth);
+        score += growth > 0 ? 1 : 0; // GetScoreOfGrowth(growth);
 
         growth = stock.EarningGrowthFiveYears();
-        if (growth <= 1.5)
+        if (growth < 0.0)
             stock.AddRemark("Gewinnwachstum gering (5J.)");
-        score += GetScoreOfGrowth(growth);
+        score += growth > 0 ? 1 : 0; // GetScoreOfGrowth(growth);
 
         growth = stock.EarningGrowthOneYear();
-        if (growth <= 1.5)
+        if (growth < 0.0)
             stock.AddRemark("Gewinnwachstum gering (1J.)");
-        score += GetScoreOfGrowth(growth);
+        score += growth > 0 ? 1 : 0; // GetScoreOfGrowth(growth);
 
         growth = stock.DividendGrowthFiveYears();
-        if (growth <= 1.5)
+        if (growth <= 0.0)
             stock.AddRemark("Dividendenwachstum gering (5J.)");
-        score += 2*GetScoreOfGrowth(growth);
+        score += growth > 0 ? 2 : 0; // 2*GetScoreOfGrowth(growth);
 
         growth = stock.DividendGrowthOneYear();
-        if (growth <= 1.5)
+        if (growth <= 0.0)
             stock.AddRemark("Dividendenwachstum gering (1J.)");
-        score += 2*GetScoreOfGrowth(growth);
+         score += growth > 0 ? 2 : 0; // 2*GetScoreOfGrowth(growth);
 
-        if (getPointsOfPayoutRatio(stock) <= 3)
+        if (getPointsOfPayoutRatio(stock) < 2)
             stock.AddRemark("Auschüttungsquote nicht gut");
-        score += 2*getPointsOfPayoutRatio(stock);
+        score += getPointsOfPayoutRatio(stock) >= 2 ? 2 : 0;
 
         stock.SetPercentag(score);
     }
