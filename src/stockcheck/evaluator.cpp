@@ -33,7 +33,7 @@ public:
 
 private:
 
-    double _minHold = 15;
+    double _minHold = 20;
     double _minBuy = 35;
 
 	void doRating(StockEntity& stock)
@@ -316,7 +316,7 @@ int getPointsOfPayoutRatio(const StockEntity& stock)
     double payout = stock.PayoutRatio();
     int point = 0;
 
-    if(payout >= 30.0 && payout <= 70.0)
+    if(payout >= 25.0 && payout <= 75.0)
         point++;
     if(payout >= 20.0 && payout <= 80.0)
         point++;

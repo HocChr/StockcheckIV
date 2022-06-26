@@ -80,7 +80,7 @@ ApplicationWindow {
 für die Bewertung einer Aktie sind der Umsatz, der Gewinn/Aktie und die Dividende/Aktie.
 
 Für jede Größe (Umsatz, Gewinn/Aktie und Dividende/Aktie) wird die Compound Annual Growth
-Rate (CAGR) auf Basis der letzten 5 Jahre berechnet. Außerdem wird die kumulierte
+Rate (CAGR) auf Basis der letzten 5 Jahre und des letzen Jahres berechnet. Außerdem wird die kumulierte
 Ausschüttungsquote der letzen 5 Jahre berechnet.
 
 Auf Basis dieser berechneten Größen werden jeweils bis zu 5 Punkte wie folgt vergeben,
@@ -94,22 +94,22 @@ CAGR > 5.0% p.a.: +1 Punkt
 ------------------------
 
 Dividenden werden stärker berücksichtigt, daher werden die erreichten Punkte aufgrund des
-Dividenden-CAGR mit dem Faktor 2 multipliziert.
+5-Jahres-Dividenden-CAGR und des 1-Jahres-Dividenden-CAGR mit dem Faktor 2 multipliziert.
 
-Für die Auschüttungsquote (AQ) werden bis zu 5 Punkte wie folgt vergeben:
+Für die Auschüttungsquote (AQ) werden bis zu 10 Punkte wie folgt vergeben:
 
-5%  < AQ < 95%: +1 Punkt
-10% < AQ < 90%: +1 Punkt
-15% < AQ < 85%: +1 Punkt
-20% < AQ < 80%: +1 Punkt
-30% < AQ < 70%: +1 Punkt
+5%  < AQ < 95%: +2 Punkte
+10% < AQ < 90%: +2 Punkte
+15% < AQ < 85%: +2 Punkte
+20% < AQ < 80%: +2 Punkte
+25% < AQ < 75%: +2 Punkte
 ------------------------
 
-Eine Aktie kann so bis zu 20 Punkte erhalten.
+Eine Aktie kann so bis zu 50 Punkte erhalten.
 Die Bewertung A, B oder C der Aktie wird wie folgt ermittelt:
 
 35 <= Punkte: Bewertung A
-15 <= Punkte: Bewertung B
+20 <= Punkte: Bewertung B
 sonst: Bewertung C
 -------------------------
 
